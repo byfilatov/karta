@@ -134,9 +134,10 @@
 
     <!-- панель выгрузки списка в файл -->
     <div class="panel" id="exportPanel">
-      <p><b>Выгрузка списка.</b> Открой файл <code>karta-progulok.html</code> в блокноте, найди блок <code>const WALKS = [ ... ];</code>, замени его целиком на текст ниже и сохрани файл. Если карта лежит на GitHub — загрузи обновлённый файл туда.</p>
+      <p><b>Выгрузка списка.</b> Проще всего: нажми «Скачать готовый index.html» и загрузи этот файл на GitHub (Add file → Upload files; у файла должно быть имя именно <code>index.html</code>, без цифр в скобках). Если кнопка не сработала — скопируй текст ниже и вставь его в файл вместо старого блока списка прогулок.</p>
       <div class="row">
-        <button class="abtn primary" id="xCopy">Скопировать</button>
+        <button class="abtn primary" id="xDownload">⬇ Скачать готовый index.html</button>
+        <button class="abtn" id="xCopy">Скопировать текст</button>
         <button class="abtn" id="xClose">Закрыть</button>
         <span class="info" id="xInfo"></span>
       </div>
@@ -453,6 +454,27 @@ $('aExport').addEventListener('click', () => {
   $('exportPanel').classList.add('show');
 });
 $('xClose').addEventListener('click', closeExport);
+/* собирает страницу целиком: берёт её исходник с сайта и подставляет новый список прогулок */
+function buildPage(src){
+  const start = src.indexOf('\nconst WALKS = [\n');
+  const end = start < 0 ? -1 : src.indexOf('\n];', start);
+  if(start < 0 || end < 0) throw new Error('список прогулок в файле не найден');
+  return src.slice(0, start + 1) + exportText() + src.slice(end + 3);
+}
+$('xDownload').addEventListener('click', async () => {
+  if(onFile){ $('xInfo').textContent = 'Скачивание работает на сайте. Здесь скопируй текст ниже.'; return; }
+  try{
+    const r = await fetch(location.href.split('#')[0], { cache:'no-store' });
+    if(!r.ok) throw new Error('http ' + r.status);
+    const out = buildPage(await r.text());
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([out], { type:'text/html;charset=utf-8' }));
+    a.download = 'index.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    $('xInfo').textContent = 'Файл index.html скачан ✔';
+  }catch(_){ $('xInfo').textContent = 'Не получилось собрать файл — скопируй текст ниже.'; }
+});
 $('xCopy').addEventListener('click', async () => {
   const t = $('exportOut').value;
   try{ await navigator.clipboard.writeText(t); }
