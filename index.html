@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Карта прогулок — BY.FILATOV walking vlog</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root{
+    --bg:#14101f; --panel:#1d1730; --panel2:#272040; --text:#f3eefc; --muted:#a79cc4;
+    --accent:#ff8a3d; --accent2:#ff5f8f; --line:#3a3059;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
+  header{padding:14px 18px;background:linear-gradient(90deg,#2a1b4a,#5a2a5e 55%,#a0415a);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  header h1{margin:0;font-size:20px;letter-spacing:.5px;user-select:none;-webkit-user-select:none}
+  header h1 small{display:block;font-size:12px;font-weight:500;color:#ffd6b8;letter-spacing:2px;margin-top:2px}
+  .badge{display:none;margin-left:10px;padding:2px 8px;border-radius:6px;background:var(--accent);color:#1b1000;font-size:11px;font-weight:800;letter-spacing:1px;vertical-align:middle}
+  body.admin #adminBadge{display:inline-block}
+  .stats{display:flex;gap:18px;font-size:13px;color:#ffe9d6}
+  .stats b{font-size:18px;color:#fff;display:block}
+  main{flex:1;display:flex;min-height:0}
+  aside{width:370px;max-width:100%;background:var(--panel);display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+  .tools{padding:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+  .tools input[type=search]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;cursor:pointer}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#1b1000;font-weight:600}
+  .list{flex:1;overflow:auto;padding:8px}
+  .item{padding:11px 12px;border-radius:12px;cursor:pointer;border:1px solid transparent;margin-bottom:6px;background:var(--panel2)}
+  .item:hover{border-color:var(--line)}
+  .item.active{border-color:var(--accent);background:#33274f}
+  .item h3{margin:0 0 4px;font-size:15px}
+  .meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+  .empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:14px}
+
+  /* ----- админ-блок: виден только в админ-режиме ----- */
+  #adminBox{display:none;flex-direction:column;gap:8px;padding:10px;border:1px dashed var(--accent);border-radius:12px}
+  body.admin #adminBox{display:flex}
+  .arow{display:flex;gap:6px;flex-wrap:wrap}
+  .abtn{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;font-size:12px}
+  .abtn:hover:not(:disabled){border-color:var(--accent)}
+  .abtn:disabled{opacity:.4;cursor:not-allowed}
+  .abtn.danger{border-color:#7a3340;color:#ff9aa8}
+  .abtn.primary{background:var(--accent);border-color:var(--accent);color:#1b1000;font-weight:700}
+  #aNote{font-size:11px;color:var(--muted);line-height:1.4}
+
+  #map{flex:1;min-width:0;background:#e8e4dc}
+  .leaflet-container{font-family:inherit}
+  .leaflet-popup-content-wrapper{background:var(--panel);color:var(--text);border-radius:14px}
+  .leaflet-popup-tip{background:var(--panel)}
+  .pop h3{margin:0 0 6px;font-size:16px}
+  .pop .meta{margin-bottom:10px}
+  .pop a{display:inline-block;padding:8px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#1b0a00;font-weight:700;text-decoration:none;font-size:13px}
+
+  .panel{position:absolute;left:12px;bottom:12px;z-index:1000;width:min(430px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:12px;display:none}
+  .panel.show{display:block}
+  .panel p{margin:0 0 8px;font-size:13px;color:var(--muted);line-height:1.4}
+  .panel .row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+  .panel .info{font-size:12px;color:var(--muted)}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+  .fields input{padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:12px;min-width:0}
+  .fields input:first-child,.fields input:nth-child(2){grid-column:1 / -1}
+  #exportOut{width:100%;height:170px;background:#0f0b1a;color:#cfe;border:1px solid var(--line);border-radius:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;padding:8px}
+  .mapwrap{position:relative;flex:1;display:flex;min-width:0}
+  .crosshair{cursor:crosshair!important}
+  .drawing path.leaflet-interactive{pointer-events:none!important}
+  .pt{width:14px;height:14px;border-radius:50%;background:#2a9df4;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.4);cursor:grab}
+  .pt.first{background:#2ecc71}
+  @media (max-width:800px){
+    main{flex-direction:column-reverse}
+    aside{width:100%;height:42vh;border-right:none;border-top:1px solid var(--line)}
+    .mapwrap{height:58vh;flex:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="logo">КАРТА ПРОГУЛОК<span class="badge" id="adminBadge">ADMIN</span><small>BY.FILATOV · WALKING VLOG</small></h1>
+  <div class="stats">
+    <div><b id="stCount">0</b>прогулок</div>
+    <div><b id="stKm">0</b>км пройдено</div>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <div class="tools">
+      <input type="search" id="q" placeholder="Поиск по названию…">
+      <div class="chips" id="chips"></div>
+
+      <div id="adminBox">
+        <div class="arow">
+          <button class="abtn primary" id="aNew">➕ Новая прогулка</button>
+          <button class="abtn" id="aEdit" disabled>✏️ Править</button>
+          <button class="abtn danger" id="aDel" disabled>🗑 Удалить</button>
+        </div>
+        <div class="arow">
+          <button class="abtn" id="aExport">📋 Выгрузить в файл</button>
+          <button class="abtn" id="aReset">↺ Сбросить правки</button>
+          <button class="abtn" id="aExit">Выйти из админки</button>
+        </div>
+        <div id="aNote"></div>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+  </aside>
+
+  <div class="mapwrap">
+    <div id="map"></div>
+
+    <!-- панель создания / правки маршрута -->
+    <div class="panel" id="drawPanel">
+      <p><b id="dHead">Новая прогулка</b><br>Кликай по карте вдоль маршрута — ставятся точки. Точку можно перетащить, правый клик по точке удаляет её.</p>
+      <div class="fields">
+        <input id="fTitle" placeholder="Название прогулки">
+        <input id="fUrl" placeholder="Ссылка на видео — вставь сюда (Ctrl+V)">
+        <input id="fDate" type="date">
+        <input id="fDistrict" placeholder="Район">
+        <input id="fTime" placeholder="Время суток: вечер">
+        <input id="fDur" placeholder="Длительность: 1:05">
+      </div>
+      <div class="row">
+        <button class="abtn" id="dUndo">↶ Убрать последнюю</button>
+        <button class="abtn danger" id="dClear">Стереть маршрут</button>
+      </div>
+      <div class="row">
+        <button class="abtn primary" id="dSave">✔ Сохранить</button>
+        <button class="abtn" id="dCancel">Отмена</button>
+        <span class="info" id="dInfo"></span>
+      </div>
+    </div>
+
+    <!-- панель выгрузки списка в файл -->
+    <div class="panel" id="exportPanel">
+      <p><b>Выгрузка списка.</b> Открой файл <code>karta-progulok.html</code> в блокноте, найди блок <code>const WALKS = [ ... ];</code>, замени его целиком на текст ниже и сохрани файл. Если карта лежит на GitHub — загрузи обновлённый файл туда.</p>
+      <div class="row">
+        <button class="abtn primary" id="xCopy">Скопировать</button>
+        <button class="abtn" id="xClose">Закрыть</button>
+        <span class="info" id="xInfo"></span>
+      </div>
+      <textarea id="exportOut" readonly></textarea>
+    </div>
+  </div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* =====================================================================
+   СПИСОК ПРОГУЛОК, КОТОРЫЙ ВИДЯТ ЗРИТЕЛИ.
+   ВНИМАНИЕ: сейчас тут ТЕСТОВЫЕ данные (маршруты примерные).
+
+   Как добавлять и править прогулки:
+   1) Включи админ-режим: быстро кликни 5 раз по заголовку «КАРТА ПРОГУЛОК»
+      (или допиши #admin в конец адреса страницы).
+   2) Создавай, правь и удаляй маршруты кнопками слева — прямо на карте.
+   3) Нажми «Выгрузить в файл» и вставь результат сюда вместо этого блока.
+   Дистанция считается сама по точкам (можно задать вручную: km:5.2).
+   ===================================================================== */
+const WALKS = [
+  { id:1, title:"Плотинка и набережная Исети", date:"2026-10-12", district:"Центр", time:"вечер", duration:"1:05",
+    url:"https://www.youtube.com/",
+    route:[[56.8389,60.5976],[56.8386,60.6054],[56.8378,60.6120],[56.8350,60.6135],[56.8330,60.6080]] },
+  { id:2, title:"Литературный квартал на закате", date:"2026-10-05", district:"Центр", time:"закат", duration:"0:48",
+    url:"https://www.youtube.com/",
+    route:[[56.8412,60.6020],[56.8398,60.6086],[56.8385,60.6140],[56.8372,60.6185]] },
+  { id:3, title:"Уралмаш: промзона и дворы", date:"2026-09-21", district:"Уралмаш", time:"день", duration:"1:30",
+    url:"https://www.youtube.com/",
+    route:[[56.8880,60.6040],[56.8905,60.6130],[56.8930,60.6190],[56.8960,60.6150],[56.8945,60.6060]] },
+  { id:4, title:"ВИЗ ночью", date:"2026-09-10", district:"ВИЗ", time:"ночь", duration:"1:15",
+    url:"https://www.youtube.com/",
+    route:[[56.8325,60.5290],[56.8340,60.5380],[56.8360,60.5440],[56.8335,60.5480]] },
+  { id:5, title:"ЦПКиО и река", date:"2026-08-30", district:"Парки", time:"день", duration:"1:40",
+    url:"https://www.youtube.com/",
+    route:[[56.8170,60.6290],[56.8190,60.6350],[56.8215,60.6400],[56.8240,60.6370],[56.8225,60.6310]] }
+];
+/* ===================================================================== */
+
+const COLOR = '#ff5f8f', COLOR_ON = '#ffb347';
+const map = L.map('map', { zoomControl:true }).setView([56.8389, 60.6057], 12);
+/* Одна светлая карта.
+   Открыта по ссылке из интернета — стандартная карта OpenStreetMap: больше всего подробностей
+   (магазины, кафе, учреждения, остановки).
+   Открыта как файл на компьютере — OSM её блокирует, поэтому берём светлую карту улиц Esri. */
+const onFile = location.protocol === 'file:';
+const base = onFile
+  ? L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      { attribution:'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, OpenStreetMap contributors', maxZoom:19 })
+  : L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom:19 });
+base.addTo(map);
+
+/* ---------- утилиты ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const safeUrl = u => /^https?:\/\//i.test(String(u || '').trim()) ? String(u).trim() : '';
+const today = () => new Date().toLocaleDateString('sv-SE');
+function dist(route){
+  const R = 6371, rad = x => x*Math.PI/180; let d = 0;
+  for(let i=1;i<route.length;i++){
+    const [a,b] = route[i-1], [c,e] = route[i];
+    const dl = rad(c-a), dn = rad(e-b);
+    const h = Math.sin(dl/2)**2 + Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dn/2)**2;
+    d += 2*R*Math.asin(Math.sqrt(h));
+  }
+  return d;
+}
+const kmOf = w => w.km ?? dist(w.route);
+const fmtDate = s => { const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}); };
+
+/* ---------- хранилище правок (только браузер админа) ---------- */
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); return true; }catch(_){ return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(_){} }
+};
+const hash = s => { let h = 5381; for(let i=0;i<s.length;i++) h = ((h<<5)+h+s.charCodeAt(i))|0; return String(h); };
+const BASE_SIG = hash(JSON.stringify(WALKS));
+const KEY_DRAFT = 'kp_draft_v1', KEY_ADMIN = 'kp_admin';
+
+function loadDraft(){
+  const raw = store.get(KEY_DRAFT); if(!raw) return null;
+  try{
+    const d = JSON.parse(raw);
+    /* если файл со списком поменялся после черновика — черновик устарел */
+    if(d.sig === BASE_SIG && Array.isArray(d.walks)) return d.walks;
+  }catch(_){}
+  store.del(KEY_DRAFT);
+  return null;
+}
+function saveDraft(){
+  const ok = store.set(KEY_DRAFT, JSON.stringify({ sig:BASE_SIG, walks }));
+  if(!ok) alert('Браузер не дал сохранить правки у себя. Выгрузи список в файл прямо сейчас, иначе правки пропадут при закрытии страницы.');
+}
+
+/* ---------- состояние ---------- */
+let isAdmin = false;
+let walks = clone(WALKS);
+let layers = {};
+let activeId = null, district = 'Все';
+let drawing = false, editId = null, pts = [];
+
+/* ---------- слои на карте ---------- */
+function buildLayers(){
+  Object.values(layers).forEach(l => map.removeLayer(l.group));
+  layers = {};
+  walks.forEach(w => {
+    const line = L.polyline(w.route, { color:COLOR, weight:4, opacity:.8 });
+    const start = L.circleMarker(w.route[0], { radius:7, color:'#fff', weight:2, fillColor:COLOR, fillOpacity:1 });
+    const url = safeUrl(w.url);
+    const popup =
+      `<div class="pop"><h3>${esc(w.title)}</h3>
+       <div class="meta"><span>📅 ${esc(fmtDate(w.date))}</span><span>📍 ${esc(w.district)}</span><span>🕒 ${esc(w.time)}</span>
+       <span>📏 ${kmOf(w).toFixed(1)} км</span>${w.duration ? `<span>⏱ ${esc(w.duration)}</span>` : ''}</div>
+       ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">▶ Смотреть на YouTube</a>` : ''}</div>`;
+    start.bindPopup(popup); line.bindPopup(popup);
+    start.on('click', () => { if(!drawing) select(w.id, false); });
+    line.on('click', () => { if(!drawing) select(w.id, false); });
+    layers[w.id] = { line, start, group: L.layerGroup([line, start]) };
+  });
+}
+
+/* ---------- фильтры и список ---------- */
+function buildChips(){
+  const ds = ['Все', ...new Set(walks.map(w => w.district))];
+  if(!ds.includes(district)) district = 'Все';
+  $('chips').innerHTML = ds.map(d => `<button class="chip${d===district?' on':''}" data-d="${esc(d)}">${esc(d)}</button>`).join('');
+}
+$('chips').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if(!b) return;
+  district = b.dataset.d; buildChips(); render();
+});
+$('q').addEventListener('input', render);
+
+function visible(){
+  const q = $('q').value.trim().toLowerCase();
+  return walks.filter(w => (district==='Все' || w.district===district) && (!q || w.title.toLowerCase().includes(q)))
+              .sort((a,b) => String(b.date).localeCompare(String(a.date)));
+}
+function render(){
+  const vis = visible(), ids = new Set(vis.map(w => w.id));
+  walks.forEach(w => {
+    const l = layers[w.id]; if(!l) return;
+    const show = ids.has(w.id) && !(drawing && editId === w.id);   /* редактируемую прячем, чтобы не мешала */
+    show ? l.group.addTo(map) : map.removeLayer(l.group);
+  });
+  $('list').innerHTML = vis.length ? vis.map(w => `
+    <div class="item${w.id===activeId?' active':''}" data-id="${w.id}">
+      <h3>${esc(w.title)}</h3>
+      <div class="meta"><span>${esc(fmtDate(w.date))}</span><span>${esc(w.district)}</span><span>${kmOf(w).toFixed(1)} км</span>${w.duration ? `<span>${esc(w.duration)}</span>` : ''}</div>
+    </div>`).join('') : '<div class="empty">Ничего не найдено</div>';
+  $('stCount').textContent = vis.length;
+  $('stKm').textContent = vis.reduce((s,w) => s + kmOf(w), 0).toFixed(1);
+  updateAdminUI();
+}
+function rebuild(){ buildLayers(); buildChips(); render(); }
+
+$('list').addEventListener('click', e => {
+  if(drawing) return;
+  const it = e.target.closest('.item'); if(it) select(+it.dataset.id, true);
+});
+
+function select(id, fly){
+  const prev = layers[activeId]; if(prev) prev.line.setStyle({ color:COLOR, weight:4 });
+  activeId = id;
+  const l = layers[id]; if(!l){ render(); return; }
+  l.line.setStyle({ color:COLOR_ON, weight:6 }); l.line.bringToFront(); l.start.bringToFront();
+  if(fly){ map.fitBounds(l.line.getBounds(), { padding:[50,50], maxZoom:16 }); }
+  render();
+  if(fly) l.start.openPopup();
+  const el = document.querySelector(`.item[data-id="${id}"]`); if(el) el.scrollIntoView({ block:'nearest' });
+}
+
+/* ---------- админ-режим ---------- */
+function updateAdminUI(){
+  if(!isAdmin) return;
+  $('aNew').disabled = drawing;
+  $('aEdit').disabled = $('aDel').disabled = (activeId == null || drawing);
+  $('aExport').disabled = drawing;
+  $('aNote').textContent = store.get(KEY_DRAFT)
+    ? 'Есть правки, которых ещё нет в файле: их видишь только ты, в этом браузере. Нажми «Выгрузить в файл», чтобы их увидели зрители.'
+    : 'Админ-режим: эти кнопки видишь только ты. Чтобы изменения увидели зрители, выгрузи список в файл.';
+}
+function setAdmin(on){
+  cancelDraw();
+  closeExport();
+  isAdmin = on;
+  document.body.classList.toggle('admin', on);
+  on ? store.set(KEY_ADMIN, '1') : store.del(KEY_ADMIN);
+  walks = on ? (loadDraft() || clone(WALKS)) : clone(WALKS);
+  activeId = null;
+  rebuild();
+}
+/* 5 быстрых кликов по заголовку включают/выключают админ-режим */
+let taps = [];
+$('logo').addEventListener('click', () => {
+  const n = Date.now(); taps = taps.filter(t => n - t < 2500); taps.push(n);
+  if(taps.length >= 5){ taps = []; setAdmin(!isAdmin); }
+});
+$('aExit').addEventListener('click', () => setAdmin(false));
+
+/* ---------- рисование / правка маршрута ---------- */
+const drawLine = L.polyline([], { color:'#2a9df4', weight:4, dashArray:'6 6', interactive:false }).addTo(map);
+const drawDots = L.layerGroup().addTo(map);
+
+function nextId(){ return walks.reduce((m,w) => Math.max(m,w.id), 0) + 1; }
+function info(){ $('dInfo').textContent = pts.length ? `${pts.length} точек · ${dist(pts).toFixed(2)} км` : 'Кликай по карте'; }
+function refreshDraw(keepDots){
+  drawLine.setLatLngs(pts);
+  if(!keepDots){
+    drawDots.clearLayers();
+    pts.forEach((p,i) => {
+      const m = L.marker(p, { draggable:true, icon:L.divIcon({ className:'pt'+(i===0?' first':''), iconSize:[14,14] }) });
+      m.on('drag', e => { const ll = e.target.getLatLng(); pts[i] = [ll.lat, ll.lng]; drawLine.setLatLngs(pts); info(); });
+      m.on('dragend', () => refreshDraw());
+      m.on('contextmenu', () => { pts.splice(i,1); refreshDraw(); });
+      m.addTo(drawDots);
+    });
+  }
+  info();
+}
+function startDraw(id){
+  closeExport();
+  drawing = true; editId = id;
+  const w = id == null ? null : walks.find(x => x.id === id);
+  pts = w ? clone(w.route) : [];
+  $('fTitle').value = w ? w.title : '';
+  $('fUrl').value = w ? (w.url || '') : '';
+  $('fDate').value = w ? w.date : today();
+  $('fDistrict').value = w ? w.district : '';
+  $('fTime').value = w ? w.time : '';
+  $('fDur').value = w ? (w.duration || '') : '';
+  $('dHead').textContent = w ? 'Правка прогулки' : 'Новая прогулка';
+  $('drawPanel').classList.add('show');
+  map.getContainer().classList.add('crosshair','drawing');
+  map.closePopup();
+  render();
+  refreshDraw();
+  if(pts.length) map.fitBounds(L.latLngBounds(pts), { padding:[60,60], maxZoom:16 });
+}
+function cancelDraw(){
+  if(!drawing) return;
+  drawing = false; editId = null; pts = [];
+  drawLine.setLatLngs([]); drawDots.clearLayers();
+  $('drawPanel').classList.remove('show');
+  map.getContainer().classList.remove('crosshair','drawing');
+  render();
+}
+function saveDraw(){
+  if(pts.length < 2){ $('dInfo').textContent = 'Нужно минимум 2 точки'; return; }
+  const v = id => $(id).value.trim();
+  const rec = {
+    title: v('fTitle') || 'Без названия',
+    date: v('fDate') || today(),
+    district: v('fDistrict') || 'Без района',
+    time: v('fTime') || 'день',
+    duration: v('fDur'),
+    url: safeUrl(v('fUrl')) || (v('fUrl') ? 'https://' + v('fUrl') : ''),
+    route: pts.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)])
+  };
+  let id;
+  if(editId != null){
+    const i = walks.findIndex(w => w.id === editId);
+    id = walks[i].id; walks[i] = { id, ...rec };
+  } else { id = nextId(); walks.push({ id, ...rec }); }
+  saveDraft();
+  drawing = false; editId = null; pts = [];
+  drawLine.setLatLngs([]); drawDots.clearLayers();
+  $('drawPanel').classList.remove('show');
+  map.getContainer().classList.remove('crosshair','drawing');
+  activeId = null;
+  rebuild();
+  select(id, true);
+}
+map.on('click', e => { if(!drawing) return; pts.push([e.latlng.lat, e.latlng.lng]); refreshDraw(); });
+$('dUndo').addEventListener('click', () => { pts.pop(); refreshDraw(); });
+$('dClear').addEventListener('click', () => {
+  if(pts.length && !confirm('Стереть все точки маршрута и начать заново?')) return;
+  pts = []; refreshDraw();
+});
+$('dSave').addEventListener('click', saveDraw);
+$('dCancel').addEventListener('click', cancelDraw);
+
+$('aNew').addEventListener('click', () => startDraw(null));
+$('aEdit').addEventListener('click', () => { if(activeId != null) startDraw(activeId); });
+$('aDel').addEventListener('click', () => {
+  const w = walks.find(x => x.id === activeId); if(!w) return;
+  if(!confirm(`Удалить прогулку «${w.title}» полностью?`)) return;
+  walks = walks.filter(x => x.id !== activeId);
+  activeId = null; saveDraft(); rebuild();
+});
+$('aReset').addEventListener('click', () => {
+  if(!confirm('Отменить все правки и вернуть список из файла?')) return;
+  cancelDraw(); store.del(KEY_DRAFT);
+  walks = clone(WALKS); activeId = null; rebuild();
+});
+
+/* ---------- выгрузка списка в файл ---------- */
+function exportText(){
+  const q = JSON.stringify;
+  const rows = walks.map(w =>
+`  { id:${w.id}, title:${q(w.title)}, date:${q(w.date)}, district:${q(w.district)}, time:${q(w.time)}, duration:${q(w.duration || '')},
+    url:${q(w.url || '')},${w.km != null ? ` km:${w.km},` : ''}
+    route:${q(w.route)} }`);
+  return `const WALKS = [\n${rows.join(',\n')}\n];`;
+}
+function closeExport(){ $('exportPanel').classList.remove('show'); }
+$('aExport').addEventListener('click', () => {
+  $('exportOut').value = exportText();
+  $('xInfo').textContent = `${walks.length} прогулок`;
+  $('exportPanel').classList.add('show');
+});
+$('xClose').addEventListener('click', closeExport);
+$('xCopy').addEventListener('click', async () => {
+  const t = $('exportOut').value;
+  try{ await navigator.clipboard.writeText(t); }
+  catch(_){ $('exportOut').select(); document.execCommand('copy'); }
+  $('xInfo').textContent = 'Скопировано ✔';
+});
+
+/* ---------- старт ---------- */
+setAdmin(location.hash === '#admin' || store.get(KEY_ADMIN) === '1');
+</script>
+</body>
+</html>
