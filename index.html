@@ -13,75 +13,143 @@
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
   body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
-  header{padding:14px 18px;background:linear-gradient(90deg,#2a1b4a,#5a2a5e 55%,#a0415a);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  button{font-family:inherit}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ---------- шапка и статистика ---------- */
+  header{padding:12px 18px;background:linear-gradient(90deg,#2a1b4a,#5a2a5e 55%,#a0415a);display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
   header h1{margin:0;font-size:20px;letter-spacing:.5px;user-select:none;-webkit-user-select:none}
   header h1 small{display:block;font-size:12px;font-weight:500;color:#ffd6b8;letter-spacing:2px;margin-top:2px}
   .badge{display:none;margin-left:10px;padding:2px 8px;border-radius:6px;background:var(--accent);color:#1b1000;font-size:11px;font-weight:800;letter-spacing:1px;vertical-align:middle}
   body.admin #adminBadge{display:inline-block}
-  .stats{display:flex;gap:18px;font-size:13px;color:#ffe9d6}
-  .stats b{font-size:18px;color:#fff;display:block}
+  .hright{display:flex;align-items:center;gap:10px;min-width:0;max-width:100%}
+  .stats{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;min-width:0}
+  .stat{min-width:66px;padding:5px 10px;border-radius:10px;background:rgba(255,255,255,.09);text-align:center;font-size:11px;color:#ffe9d6;line-height:1.25;transition:background .2s}
+  .stat:hover{background:rgba(255,255,255,.16)}
+  .stat b{display:block;font-size:17px;color:#fff;font-variant-numeric:tabular-nums}
+  .stextra{flex-basis:100%;font-size:12px;color:#ffd6b8;margin-top:-4px}
+  .icon-btn{flex:none;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:18px;cursor:pointer;transition:background .2s,transform .1s}
+  .icon-btn:hover{background:rgba(255,255,255,.2)}
+  .icon-btn:active{transform:scale(.94)}
+
   main{flex:1;display:flex;min-height:0}
-  aside{width:370px;max-width:100%;background:var(--panel);display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+  aside{width:380px;max-width:100%;background:var(--panel);display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
   .tools{padding:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
-  .tools input[type=search]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:14px}
+  .tools input[type=search]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:14px;transition:border-color .2s}
+  .tools input[type=search]:focus{outline:none;border-color:var(--accent)}
   .chips{display:flex;flex-wrap:wrap;gap:6px}
-  .chip{padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;cursor:pointer}
+  .chip{padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:background .2s,color .2s,border-color .2s,transform .1s}
+  .chip:hover{border-color:var(--accent);color:var(--text)}
+  .chip:active{transform:scale(.96)}
   .chip.on{background:var(--accent);border-color:var(--accent);color:#1b1000;font-weight:600}
-  .list{flex:1;overflow:auto;padding:8px}
-  .item{padding:11px 12px;border-radius:12px;cursor:pointer;border:1px solid transparent;margin-bottom:6px;background:var(--panel2)}
-  .item:hover{border-color:var(--line)}
-  .item.active{border-color:var(--accent);background:#33274f}
-  .item h3{margin:0 0 4px;font-size:15px}
-  .meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+
+  /* ---------- карточки прогулок ---------- */
+  .list{flex:1;overflow:auto;padding:10px;scroll-behavior:smooth}
+  .item{position:relative;border-radius:14px;border:1px solid var(--line);margin-bottom:10px;background:var(--panel2);overflow:hidden;cursor:pointer;
+        transition:transform .18s ease,border-color .18s,box-shadow .18s;animation:cardIn .45s ease backwards;animation-delay:calc(var(--i,0) * 45ms)}
+  .list.noanim .item{animation:none}
+  @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .item:hover{transform:translateY(-2px);border-color:#5d4c91;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+  .item.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 8px 26px rgba(255,138,61,.22)}
+  .thumb{position:relative;height:116px;background:#2a2146;overflow:hidden}
+  .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+  .item:hover .thumb img{transform:scale(1.06)}
+  .thumb .ph{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:2px;
+             background:linear-gradient(135deg,#3b2466 0%,#7a3470 55%,#d9663f 100%);color:rgba(255,255,255,.85)}
+  .thumb .ph i{font-style:normal;font-size:30px;opacity:.8}
+  .thumb .ph span{font-size:10px;letter-spacing:3px;opacity:.7;margin-top:-6px}
+  .thumb.noimg .ph{display:flex}
+  .thumb.noimg img{display:none}
+  .thumb .shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,8,28,.95) 0%,rgba(14,8,28,.55) 42%,rgba(14,8,28,.05) 78%)}
+  .thumb h3{position:absolute;left:12px;right:12px;bottom:9px;margin:0;font-size:15px;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,.8);
+            display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .cbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:9px 12px}
+  .meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:3px 10px;min-width:0;flex:1 1 150px}
+  .vb{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+  .watch{flex:none;padding:7px 12px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#1b0a00;font-weight:700;font-size:12px;text-decoration:none;white-space:nowrap;transition:filter .2s,transform .1s}
+  .watch.vk,.pop a.vk{background:#0077ff;color:#fff}
+  .watch:hover{filter:brightness(1.1)}
+  .watch:active{transform:scale(.96)}
   .empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:14px}
 
-  /* ----- админ-блок: виден только в админ-режиме ----- */
+  .aside-foot{padding:10px 12px;border-top:1px solid var(--line)}
+  .sup-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--accent);background:linear-gradient(90deg,rgba(255,138,61,.18),rgba(255,95,143,.18));color:var(--text);font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;transition:filter .2s,transform .1s}
+  a.sup-btn:hover{filter:brightness(1.2)}
+  .sup-btn.off{border-style:dashed;border-color:var(--line);background:transparent;color:var(--muted);cursor:not-allowed}
+  .sup-btn small{font-weight:500;opacity:.8}
+
+  /* ---------- админ-блок: виден только в админ-режиме ---------- */
   #adminBox{display:none;flex-direction:column;gap:8px;padding:10px;border:1px dashed var(--accent);border-radius:12px}
   body.admin #adminBox{display:flex}
   .arow{display:flex;gap:6px;flex-wrap:wrap}
-  .abtn{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;font-size:12px}
+  .abtn{padding:7px 11px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer;font-size:12px;transition:border-color .2s,background .2s,transform .1s}
   .abtn:hover:not(:disabled){border-color:var(--accent)}
+  .abtn:active:not(:disabled){transform:scale(.96)}
   .abtn:disabled{opacity:.4;cursor:not-allowed}
   .abtn.danger{border-color:#7a3340;color:#ff9aa8}
   .abtn.primary{background:var(--accent);border-color:var(--accent);color:#1b1000;font-weight:700}
   #aNote{font-size:11px;color:var(--muted);line-height:1.4}
 
+  /* ---------- карта ---------- */
   #map{flex:1;min-width:0;background:#e8e4dc}
   .leaflet-container{font-family:inherit}
   .leaflet-popup-content-wrapper{background:var(--panel);color:var(--text);border-radius:14px}
   .leaflet-popup-tip{background:var(--panel)}
   .pop h3{margin:0 0 6px;font-size:16px}
   .pop .meta{margin-bottom:10px}
-  .pop a{display:inline-block;padding:8px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#1b0a00;font-weight:700;text-decoration:none;font-size:13px}
+  .pop .vb{margin-left:0}
+  .pop a{display:inline-block;padding:8px 14px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#1b0a00;font-weight:700;text-decoration:none;font-size:13px}
+  .route-glow{filter:blur(4px)}
+  .mk-wrap{background:none;border:none}
+  .mk{width:28px;height:28px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;line-height:1}
+  .mk.start{background:#16a34a;padding-left:2px}
+  .mk.end{background:#e11d48}
+  .drawing .mk-wrap{pointer-events:none!important}
 
   .panel{position:absolute;left:12px;bottom:12px;z-index:1000;width:min(430px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:12px;display:none}
-  .panel.show{display:block}
+  .panel.show{display:block;animation:cardIn .25s ease}
   .panel p{margin:0 0 8px;font-size:13px;color:var(--muted);line-height:1.4}
   .panel .row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
   .panel .info{font-size:12px;color:var(--muted)}
   .fields{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
   .fields input{padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:12px;min-width:0}
-  .fields input:first-child,.fields input:nth-child(2){grid-column:1 / -1}
+  .fields input:nth-child(-n+3){grid-column:1 / -1}
   #exportOut{width:100%;height:170px;background:#0f0b1a;color:#cfe;border:1px solid var(--line);border-radius:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;padding:8px}
   .mapwrap{position:relative;flex:1;display:flex;min-width:0}
   .crosshair{cursor:crosshair!important}
   .drawing path.leaflet-interactive{pointer-events:none!important}
   .pt{width:14px;height:14px;border-radius:50%;background:#2a9df4;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.4);cursor:grab}
   .pt.first{background:#2ecc71}
+
   @media (max-width:800px){
+    header{padding:10px 12px}
+    header h1{font-size:17px}
+    .hright{width:100%}
+    .stats{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;flex:1;scrollbar-width:none}
+    .stats::-webkit-scrollbar{display:none}
+    .stat{flex:none;min-width:60px}
+    .stextra{display:none}
     main{flex-direction:column-reverse}
-    aside{width:100%;height:42vh;border-right:none;border-top:1px solid var(--line)}
-    .mapwrap{height:58vh;flex:none}
+    aside{width:100%;height:46vh;border-right:none;border-top:1px solid var(--line);overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .list{flex:none;overflow:visible}      /* на телефоне прокручивается вся нижняя панель: админ-кнопки уезжают вверх и не съедают список */
+    .mapwrap{height:54vh;flex:none}
+    .thumb{height:92px}
+    .tools{padding:8px 10px;gap:8px}
+    .aside-foot{padding:8px 10px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
   }
 </style>
 </head>
 <body>
 <header>
   <h1 id="logo">КАРТА ПРОГУЛОК<span class="badge" id="adminBadge">ADMIN</span><small>BY.FILATOV · WALKING VLOG</small></h1>
-  <div class="stats">
-    <div><b id="stCount">0</b>прогулок</div>
-    <div><b id="stKm">0</b>км пройдено</div>
+  <div class="hright">
+    <div class="stats" id="stats"></div>
+    <button class="icon-btn" id="sndBtn" aria-pressed="false" title="Звук выключен">🔇</button>
   </div>
+  <div class="stextra" id="stExtra"></div>
 </header>
 
 <main>
@@ -94,7 +162,7 @@
         <div class="arow">
           <button class="abtn primary" id="aNew">➕ Новая прогулка</button>
           <button class="abtn" id="aEdit" disabled>✏️ Править</button>
-          <button class="abtn danger" id="aDel" disabled>🗑 Удалить</button>
+          <button class="abtn danger" id="aDel" data-nosnd="1" disabled>🗑 Удалить</button>
         </div>
         <div class="arow">
           <button class="abtn" id="aExport">📋 Выгрузить в файл</button>
@@ -105,6 +173,7 @@
       </div>
     </div>
     <div class="list" id="list"></div>
+    <div class="aside-foot" id="support"></div>
   </aside>
 
   <div class="mapwrap">
@@ -115,18 +184,20 @@
       <p><b id="dHead">Новая прогулка</b><br>Кликай по карте вдоль маршрута — ставятся точки. Точку можно перетащить, правый клик по точке удаляет её.</p>
       <div class="fields">
         <input id="fTitle" placeholder="Название прогулки">
-        <input id="fUrl" placeholder="Ссылка на видео — вставь сюда (Ctrl+V)">
+        <input id="fYoutube" placeholder="Ссылка на YouTube (по желанию) — вставь сюда">
+        <input id="fVk" placeholder="Ссылка на VK Видео (по желанию) — вставь сюда">
         <input id="fDate" type="date">
         <input id="fDistrict" placeholder="Район">
         <input id="fTime" placeholder="Время суток: вечер">
         <input id="fDur" placeholder="Длительность: 1:05">
+        <input id="fViews" type="number" min="0" step="1" placeholder="Просмотры (по желанию)">
       </div>
       <div class="row">
         <button class="abtn" id="dUndo">↶ Убрать последнюю</button>
         <button class="abtn danger" id="dClear">Стереть маршрут</button>
       </div>
       <div class="row">
-        <button class="abtn primary" id="dSave">✔ Сохранить</button>
+        <button class="abtn primary" id="dSave" data-nosnd="1">✔ Сохранить</button>
         <button class="abtn" id="dCancel">Отмена</button>
         <span class="info" id="dInfo"></span>
       </div>
@@ -136,8 +207,8 @@
     <div class="panel" id="exportPanel">
       <p><b>Выгрузка списка.</b> Проще всего: нажми «Скачать готовый index.html» и загрузи этот файл на GitHub (Add file → Upload files; у файла должно быть имя именно <code>index.html</code>, без цифр в скобках). Если кнопка не сработала — скопируй текст ниже и вставь его в файл вместо старого блока списка прогулок.</p>
       <div class="row">
-        <button class="abtn primary" id="xDownload">⬇ Скачать готовый index.html</button>
-        <button class="abtn" id="xCopy">Скопировать текст</button>
+        <button class="abtn primary" id="xDownload" data-nosnd="1">⬇ Скачать готовый index.html</button>
+        <button class="abtn" id="xCopy" data-nosnd="1">Скопировать текст</button>
         <button class="abtn" id="xClose">Закрыть</button>
         <span class="info" id="xInfo"></span>
       </div>
@@ -150,14 +221,16 @@
 <script>
 /* =====================================================================
    СПИСОК ПРОГУЛОК, КОТОРЫЙ ВИДЯТ ЗРИТЕЛИ.
-   ВНИМАНИЕ: сейчас тут ТЕСТОВЫЕ данные (маршруты примерные).
 
    Как добавлять и править прогулки:
    1) Включи админ-режим: быстро кликни 5 раз по заголовку «КАРТА ПРОГУЛОК»
       (или допиши #admin в конец адреса страницы).
    2) Создавай, правь и удаляй маршруты кнопками слева — прямо на карте.
-   3) Нажми «Выгрузить в файл» и вставь результат сюда вместо этого блока.
+   3) Нажми «Выгрузить в файл» → «Скачать готовый index.html» и загрузи файл на GitHub.
    Дистанция считается сама по точкам (можно задать вручную: km:5.2).
+   Необязательное поле views:1234 — число просмотров, которое ты вписываешь сам.
+   Ссылки на видео: youtube:"..." и vk:"..." — можно обе, одну или ни одной.
+   (Старое поле url:"..." тоже читается: оно считается ссылкой на YouTube.)
    ===================================================================== */
 const WALKS = [
   { id:6, title:"Прогулка по Екатеринбургу: от Ленина до Восточной. Шарташский рынок | 24 октября | 4K Walking Vlog", date:"2026-10-29", district:"Центр", time:"день", duration:"",
@@ -166,7 +239,13 @@ const WALKS = [
 ];
 /* ===================================================================== */
 
-const COLOR = '#ff5f8f', COLOR_ON = '#ffb347';
+/* ---------- настройки ---------- */
+/* Ссылка на поддержку канала. Пока пусто — кнопка «Поддержать» выключена.
+   Когда появится настоящая ссылка, вставь её между кавычками: const SUPPORT_URL = 'https://...'; */
+const SUPPORT_URL = '';
+const ORANGE = '#ff8a3d', SEL = '#ff6b57', CASING = '#140a24';
+const REDUCE = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
 const map = L.map('map', { zoomControl:true }).setView([56.8389, 60.6057], 12);
 /* Одна светлая карта.
    Открыта по ссылке из интернета — стандартная карта OpenStreetMap: больше всего подробностей
@@ -185,6 +264,23 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone = o => JSON.parse(JSON.stringify(o));
 const safeUrl = u => /^https?:\/\//i.test(String(u || '').trim()) ? String(u).trim() : '';
+const normUrl = u => { u = String(u || '').trim(); return u ? (safeUrl(u) || 'https://' + u) : ''; };   /* без https:// дописываем сами */
+const isVk = u => /^(?:https?:\/\/)?(?:[\w-]+\.)*(?:vk\.com|vk\.ru|vkvideo\.ru|vk\.cc)(?:[\/:?#]|$)/i.test(String(u || '').trim());
+/* у каждой прогулки две необязательные ссылки: youtube и vk. Старое поле url — это ссылка на YouTube (или VK, если по виду она оттуда) */
+function normWalk(w){
+  const o = { ...w };
+  if(o.url){ const k = isVk(o.url) ? 'vk' : 'youtube'; if(!o[k]) o[k] = o.url; }
+  delete o.url;
+  return o;
+}
+const ytUrl = w => safeUrl(w.youtube), vkUrl = w => safeUrl(w.vk);
+const hasVideo = w => !!(ytUrl(w) || vkUrl(w));
+function videoBtns(w, cls){
+  const y = ytUrl(w), v = vkUrl(w);
+  return (y ? `<a class="${cls} yt" href="${esc(y)}" target="_blank" rel="noopener">▶ YouTube</a>` : '')
+       + (v ? `<a class="${cls} vk" href="${esc(v)}" target="_blank" rel="noopener">▶ VK Видео</a>` : '');
+}
+const freshWalks = () => clone(WALKS).map(normWalk);
 const today = () => new Date().toLocaleDateString('sv-SE');
 function dist(route){
   const R = 6371, rad = x => x*Math.PI/180; let d = 0;
@@ -199,7 +295,25 @@ function dist(route){
 const kmOf = w => w.km ?? dist(w.route);
 const fmtDate = s => { const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}); };
 
-/* ---------- хранилище правок (только браузер админа) ---------- */
+/* id видео из ссылки: watch?v=, youtu.be/, shorts/, embed/ (+ live/, v/) */
+function ytId(u){
+  const m = String(u || '').trim().match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|shorts\/|embed\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/i);
+  return m ? m[1] : '';
+}
+/* длительность "1:05" (ч:мм) или "1:05:30" → минуты; непонятный формат → null */
+function parseDur(s){
+  const m = String(s || '').trim().match(/^(\d+):(\d{1,2})(?::(\d{1,2}))?$/);
+  if(!m || +m[2] > 59 || (m[3] && +m[3] > 59)) return null;
+  return +m[1]*60 + +m[2] + (m[3] ? +m[3]/60 : 0);
+}
+function fmtMin(total){
+  let h = Math.floor(total/60), m = Math.round(total - h*60);
+  if(m === 60){ h++; m = 0; }
+  return h ? `${h} ч ${m} м` : `${m} м`;
+}
+const fmtNum = n => Number(n).toLocaleString('ru-RU');
+
+/* ---------- хранилище (только браузер админа и настройка звука) ---------- */
 const store = {
   get(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } },
   set(k,v){ try{ localStorage.setItem(k,v); return true; }catch(_){ return false; } },
@@ -207,14 +321,14 @@ const store = {
 };
 const hash = s => { let h = 5381; for(let i=0;i<s.length;i++) h = ((h<<5)+h+s.charCodeAt(i))|0; return String(h); };
 const BASE_SIG = hash(JSON.stringify(WALKS));
-const KEY_DRAFT = 'kp_draft_v1', KEY_ADMIN = 'kp_admin';
+const KEY_DRAFT = 'kp_draft_v1', KEY_ADMIN = 'kp_admin', KEY_SND = 'kp_sound';
 
 function loadDraft(){
   const raw = store.get(KEY_DRAFT); if(!raw) return null;
   try{
     const d = JSON.parse(raw);
     /* если файл со списком поменялся после черновика — черновик устарел */
-    if(d.sig === BASE_SIG && Array.isArray(d.walks)) return d.walks;
+    if(d.sig === BASE_SIG && Array.isArray(d.walks)) return d.walks.map(normWalk);
   }catch(_){}
   store.del(KEY_DRAFT);
   return null;
@@ -224,34 +338,123 @@ function saveDraft(){
   if(!ok) alert('Браузер не дал сохранить правки у себя. Выгрузи список в файл прямо сейчас, иначе правки пропадут при закрытии страницы.');
 }
 
+/* ---------- звуки (Web Audio, без файлов; по умолчанию выключены) ---------- */
+let soundOn = store.get(KEY_SND) === '1';
+let actx = null;
+function audio(){
+  try{
+    if(!actx){ const C = window.AudioContext || window.webkitAudioContext; if(!C) return null; actx = new C(); }
+    if(actx.state === 'suspended') actx.resume();
+    return actx;
+  }catch(_){ return null; }
+}
+function beep(freq, start, dur, type, vol, slideTo){
+  const c = audio(); if(!c) return;
+  const t = c.currentTime + start, o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(freq, t);
+  if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + 0.03);
+}
+const SND = {
+  click(){ beep(520, 0, .06, 'triangle', .035); },
+  select(){ beep(440, 0, .09, 'sine', .045); beep(660, .07, .15, 'sine', .045); },
+  success(){ beep(523, 0, .12, 'sine', .05); beep(659, .1, .12, 'sine', .05); beep(784, .2, .24, 'sine', .055); },
+  remove(){ beep(300, 0, .2, 'triangle', .045, 150); }
+};
+function play(name){ if(!soundOn) return; try{ SND[name](); }catch(_){} }
+function updateSndBtn(){
+  const b = $('sndBtn');
+  b.textContent = soundOn ? '🔊' : '🔇';
+  b.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+  b.title = soundOn ? 'Звук включён (нажми, чтобы выключить)' : 'Звук выключен (нажми, чтобы включить)';
+}
+$('sndBtn').addEventListener('click', () => {
+  soundOn = !soundOn; store.set(KEY_SND, soundOn ? '1' : '0'); updateSndBtn();
+  if(soundOn) play('click');
+});
+/* лёгкий «клик» на кнопки (кроме тех, у которых свой звук) */
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if(!b || b.id === 'sndBtn' || b.disabled || b.dataset.nosnd) return;
+  play('click');
+});
+
 /* ---------- состояние ---------- */
 let isAdmin = false;
-let walks = clone(WALKS);
+let walks = freshWalks();
 let layers = {};
 let activeId = null, district = 'Все';
 let drawing = false, editId = null, pts = [];
+let animToken = 0;
 
 /* ---------- слои на карте ---------- */
+function mkIcon(cls, glyph){
+  return L.divIcon({ className:'mk-wrap', html:`<div class="mk ${cls}">${glyph}</div>`, iconSize:[28,28], iconAnchor:[14,14] });
+}
+function popupHtml(w){
+  return `<div class="pop"><h3>${esc(w.title)}</h3>
+     <div class="meta"><span>📅 ${esc(fmtDate(w.date))}</span><span>📍 ${esc(w.district)}</span><span>🕒 ${esc(w.time)}</span>
+     <span>📏 ${kmOf(w).toFixed(1)} км</span>${w.duration ? `<span>⏱ ${esc(w.duration)}</span>` : ''}${Number.isFinite(w.views) ? `<span>👁 ${fmtNum(w.views)}</span>` : ''}</div>
+     ${hasVideo(w) ? `<div class="vb">${videoBtns(w, 'vbtn')}</div>` : ''}</div>`;
+}
 function buildLayers(){
-  Object.values(layers).forEach(l => map.removeLayer(l.group));
+  animToken++;
+  Object.values(layers).forEach(l => { clearAnim(l); map.removeLayer(l.group); });
   layers = {};
   walks.forEach(w => {
-    const line = L.polyline(w.route, { color:COLOR, weight:4, opacity:.8 });
-    const start = L.circleMarker(w.route[0], { radius:7, color:'#fff', weight:2, fillColor:COLOR, fillOpacity:1 });
-    const url = safeUrl(w.url);
-    const popup =
-      `<div class="pop"><h3>${esc(w.title)}</h3>
-       <div class="meta"><span>📅 ${esc(fmtDate(w.date))}</span><span>📍 ${esc(w.district)}</span><span>🕒 ${esc(w.time)}</span>
-       <span>📏 ${kmOf(w).toFixed(1)} км</span>${w.duration ? `<span>⏱ ${esc(w.duration)}</span>` : ''}</div>
-       ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">▶ Смотреть на YouTube</a>` : ''}</div>`;
-    start.bindPopup(popup); line.bindPopup(popup);
-    start.on('click', () => { if(!drawing) select(w.id, false); });
-    line.on('click', () => { if(!drawing) select(w.id, false); });
-    layers[w.id] = { line, start, group: L.layerGroup([line, start]) };
+    const ll = w.route, round = { lineCap:'round', lineJoin:'round' };
+    const casing = L.polyline(ll, { ...round, color:CASING, weight:10, opacity:.8, interactive:false });          /* тёмная подложка */
+    const glow   = L.polyline(ll, { ...round, color:SEL, weight:17, opacity:0, className:'route-glow', interactive:false }); /* свечение выбранного */
+    const line   = L.polyline(ll, { ...round, color:ORANGE, weight:5.5, opacity:1, interactive:false });         /* сам маршрут */
+    const hit    = L.polyline(ll, { color:'#000', weight:22, opacity:0, interactive:true });                      /* широкая зона клика */
+    const start  = L.marker(ll[0], { icon:mkIcon('start','▶'), title:'Старт', keyboard:false, zIndexOffset:500 });
+    const end    = L.marker(ll[ll.length-1], { icon:mkIcon('end','■'), title:'Финиш', keyboard:false, zIndexOffset:400 });
+    const html = popupHtml(w);
+    [hit, start, end].forEach(x => { x.bindPopup(html); x.on('click', () => { if(!drawing) select(w.id, false); }); });
+    hit.on('mouseover', () => { if(!drawing && w.id !== activeId) line.setStyle({ weight:7 }); });
+    hit.on('mouseout',  () => { if(w.id !== activeId) line.setStyle({ weight:5.5 }); });
+    layers[w.id] = { casing, glow, line, hit, start, end, group: L.layerGroup([casing, glow, line, hit, start, end]) };
   });
 }
+function setStyleFor(id, on){
+  const l = layers[id]; if(!l) return;
+  clearAnim(l);
+  if(on){
+    l.casing.setStyle({ weight:12, opacity:.9 });
+    l.glow.setStyle({ opacity:.5 });
+    l.line.setStyle({ color:SEL, weight:6.5 });
+  } else {
+    l.casing.setStyle({ weight:10, opacity:.8 });
+    l.glow.setStyle({ opacity:0 });
+    l.line.setStyle({ color:ORANGE, weight:5.5 });
+  }
+}
+/* плавная прорисовка маршрута (один path, без перерисовки карты) */
+function clearAnim(l){
+  clearTimeout(l.animT);
+  const p = l.line && l.line.getElement && l.line.getElement();
+  if(p){ p.style.transition = ''; p.style.strokeDasharray = ''; p.style.strokeDashoffset = ''; }
+}
+function drawRoute(l){
+  if(REDUCE) return;
+  const p = l.line.getElement(); if(!p || !p.getTotalLength) return;
+  let len; try{ len = p.getTotalLength(); }catch(_){ return; }
+  if(!(len > 0)) return;
+  p.style.transition = 'none';
+  p.style.strokeDasharray = len + ' ' + len;
+  p.style.strokeDashoffset = len;
+  p.getBoundingClientRect();                                  /* принудительная перерисовка перед стартом */
+  const dur = Math.min(1600, Math.max(700, len * .9));
+  p.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.4,0,.2,1)`;
+  p.style.strokeDashoffset = 0;
+  l.animT = setTimeout(() => clearAnim(l), dur + 80);
+}
 
-/* ---------- фильтры и список ---------- */
+/* ---------- фильтры, статистика и список ---------- */
 function buildChips(){
   const ds = ['Все', ...new Set(walks.map(w => w.district))];
   if(!ds.includes(district)) district = 'Все';
@@ -259,47 +462,103 @@ function buildChips(){
 }
 $('chips').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if(!b) return;
-  district = b.dataset.d; buildChips(); render();
+  district = b.dataset.d; buildChips(); render(true);
 });
-$('q').addEventListener('input', render);
+$('q').addEventListener('input', () => render(false));
 
 function visible(){
   const q = $('q').value.trim().toLowerCase();
   return walks.filter(w => (district==='Все' || w.district===district) && (!q || w.title.toLowerCase().includes(q)))
               .sort((a,b) => String(b.date).localeCompare(String(a.date)));
 }
-function render(){
+/* только то, что реально можно посчитать из данных; ничего не выдумываем */
+function renderStats(list){
+  const n = list.length;
+  const km = list.reduce((s,w) => s + kmOf(w), 0);
+  const videos = list.filter(hasVideo).length;
+  const districts = new Set(list.map(w => w.district)).size;
+  let mins = 0, nd = 0;
+  list.forEach(w => { const m = parseDur(w.duration); if(m != null){ mins += m; nd++; } });
+  const vw = list.filter(w => Number.isFinite(w.views));
+  const part = k => k < n ? ` (по ${k} из ${n})` : '';
+  const tiles = [
+    [n, 'прогулок'], [km.toFixed(1), 'км пройдено'], [videos, 'видео'], [districts, 'районов']
+  ];
+  if(nd) tiles.push([fmtMin(mins), 'в пути' + part(nd)]);
+  if(vw.length) tiles.push([fmtNum(vw.reduce((s,w) => s + w.views, 0)), 'просмотров' + part(vw.length)]);
+  $('stats').innerHTML = tiles.map(t => `<div class="stat"><b>${esc(t[0])}</b>${esc(t[1])}</div>`).join('');
+  if(n){
+    const longest = list.reduce((a,b) => kmOf(b) > kmOf(a) ? b : a);
+    $('stExtra').innerHTML = `Самая длинная: «${esc(longest.title)}» — ${kmOf(longest).toFixed(1)} км · в среднем ${(km/n).toFixed(1)} км за прогулку`;
+  } else $('stExtra').textContent = '';
+}
+function cardHtml(w, i){
+  const id = ytId(w.youtube);                 /* обложку берём только у YouTube */
+  const thumb = id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
+  return `
+    <div class="item${w.id===activeId?' active':''}" data-id="${w.id}" style="--i:${Math.min(i,10)}" tabindex="0" role="button">
+      <div class="thumb${thumb?'':' noimg'}">
+        ${thumb ? `<img src="${thumb}" alt="" loading="lazy" decoding="async">` : ''}
+        <div class="ph" aria-hidden="true"><i>▶</i><span>BY.FILATOV</span></div>
+        <div class="shade"></div>
+        <h3>${esc(w.title)}</h3>
+      </div>
+      <div class="cbar">
+        <div class="meta"><span>${esc(fmtDate(w.date))}</span><span>${esc(w.district)}</span><span>${kmOf(w).toFixed(1)} км</span>${w.duration ? `<span>${esc(w.duration)}</span>` : ''}${Number.isFinite(w.views) ? `<span>👁 ${fmtNum(w.views)}</span>` : ''}</div>
+        ${hasVideo(w) ? `<div class="vb">${videoBtns(w, 'watch')}</div>` : ''}
+      </div>
+    </div>`;
+}
+function render(animate){
   const vis = visible(), ids = new Set(vis.map(w => w.id));
+  /* выбранная прогулка пропала из списка (фильтр/поиск) — снимаем выбор, чтобы «Удалить/Править» не трогали скрытую */
+  if(activeId != null && !ids.has(activeId)){ setStyleFor(activeId, false); activeId = null; }
   walks.forEach(w => {
     const l = layers[w.id]; if(!l) return;
     const show = ids.has(w.id) && !(drawing && editId === w.id);   /* редактируемую прячем, чтобы не мешала */
     show ? l.group.addTo(map) : map.removeLayer(l.group);
   });
-  $('list').innerHTML = vis.length ? vis.map(w => `
-    <div class="item${w.id===activeId?' active':''}" data-id="${w.id}">
-      <h3>${esc(w.title)}</h3>
-      <div class="meta"><span>${esc(fmtDate(w.date))}</span><span>${esc(w.district)}</span><span>${kmOf(w).toFixed(1)} км</span>${w.duration ? `<span>${esc(w.duration)}</span>` : ''}</div>
-    </div>`).join('') : '<div class="empty">Ничего не найдено</div>';
-  $('stCount').textContent = vis.length;
-  $('stKm').textContent = vis.reduce((s,w) => s + kmOf(w), 0).toFixed(1);
+  $('list').classList.toggle('noanim', !animate);
+  $('list').innerHTML = vis.length ? vis.map(cardHtml).join('') : '<div class="empty">Ничего не найдено</div>';
+  renderStats(vis);
   updateAdminUI();
 }
-function rebuild(){ buildLayers(); buildChips(); render(); }
+function rebuild(){ buildLayers(); buildChips(); render(true); }
 
+/* обложка не загрузилась — показываем красивую заглушку */
+$('list').addEventListener('error', e => {
+  if(e.target.tagName === 'IMG'){ const t = e.target.closest('.thumb'); if(t) t.classList.add('noimg'); }
+}, true);
 $('list').addEventListener('click', e => {
-  if(drawing) return;
+  if(drawing || e.target.closest('a')) return;
   const it = e.target.closest('.item'); if(it) select(+it.dataset.id, true);
 });
+$('list').addEventListener('keydown', e => {
+  if((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('item')){
+    e.preventDefault(); select(+e.target.dataset.id, true);
+  }
+});
 
-function select(id, fly){
-  const prev = layers[activeId]; if(prev) prev.line.setStyle({ color:COLOR, weight:4 });
+function markActive(){
+  document.querySelectorAll('.item').forEach(el => el.classList.toggle('active', +el.dataset.id === activeId));
+  const el = document.querySelector(`.item[data-id="${activeId}"]`); if(el) el.scrollIntoView({ block:'nearest', behavior: REDUCE ? 'auto' : 'smooth' });
+}
+function select(id, fly, quiet){
+  const l = layers[id]; if(!l) return;
+  if(activeId != null && activeId !== id) setStyleFor(activeId, false);   /* старое выделение сбрасываем */
   activeId = id;
-  const l = layers[id]; if(!l){ render(); return; }
-  l.line.setStyle({ color:COLOR_ON, weight:6 }); l.line.bringToFront(); l.start.bringToFront();
-  if(fly){ map.fitBounds(l.line.getBounds(), { padding:[50,50], maxZoom:16 }); }
-  render();
-  if(fly) l.start.openPopup();
-  const el = document.querySelector(`.item[data-id="${id}"]`); if(el) el.scrollIntoView({ block:'nearest' });
+  setStyleFor(id, true);
+  l.casing.bringToFront(); l.glow.bringToFront(); l.line.bringToFront(); l.hit.bringToFront();
+  markActive();
+  if(!quiet) play('select');
+  const token = ++animToken;
+  if(fly) map.fitBounds(l.line.getBounds(), { padding:[50,50], maxZoom:16, animate:!REDUCE });
+  setTimeout(() => {
+    if(token !== animToken || activeId !== id) return;        /* пока ждали, выбрали другую — ничего не делаем */
+    drawRoute(l);
+    if(fly) l.start.openPopup();
+  }, fly && !REDUCE ? 500 : 0);
+  updateAdminUI();
 }
 
 /* ---------- админ-режим ---------- */
@@ -318,7 +577,7 @@ function setAdmin(on){
   isAdmin = on;
   document.body.classList.toggle('admin', on);
   on ? store.set(KEY_ADMIN, '1') : store.del(KEY_ADMIN);
-  walks = on ? (loadDraft() || clone(WALKS)) : clone(WALKS);
+  walks = on ? (loadDraft() || freshWalks()) : freshWalks();
   activeId = null;
   rebuild();
 }
@@ -336,18 +595,16 @@ const drawDots = L.layerGroup().addTo(map);
 
 function nextId(){ return walks.reduce((m,w) => Math.max(m,w.id), 0) + 1; }
 function info(){ $('dInfo').textContent = pts.length ? `${pts.length} точек · ${dist(pts).toFixed(2)} км` : 'Кликай по карте'; }
-function refreshDraw(keepDots){
+function refreshDraw(){
   drawLine.setLatLngs(pts);
-  if(!keepDots){
-    drawDots.clearLayers();
-    pts.forEach((p,i) => {
-      const m = L.marker(p, { draggable:true, icon:L.divIcon({ className:'pt'+(i===0?' first':''), iconSize:[14,14] }) });
-      m.on('drag', e => { const ll = e.target.getLatLng(); pts[i] = [ll.lat, ll.lng]; drawLine.setLatLngs(pts); info(); });
-      m.on('dragend', () => refreshDraw());
-      m.on('contextmenu', () => { pts.splice(i,1); refreshDraw(); });
-      m.addTo(drawDots);
-    });
-  }
+  drawDots.clearLayers();
+  pts.forEach((p,i) => {
+    const m = L.marker(p, { draggable:true, icon:L.divIcon({ className:'pt'+(i===0?' first':''), iconSize:[14,14] }) });
+    m.on('drag', e => { const ll = e.target.getLatLng(); pts[i] = [ll.lat, ll.lng]; drawLine.setLatLngs(pts); info(); });
+    m.on('dragend', () => refreshDraw());
+    m.on('contextmenu', () => { pts.splice(i,1); refreshDraw(); });
+    m.addTo(drawDots);
+  });
   info();
 }
 function startDraw(id){
@@ -356,16 +613,18 @@ function startDraw(id){
   const w = id == null ? null : walks.find(x => x.id === id);
   pts = w ? clone(w.route) : [];
   $('fTitle').value = w ? w.title : '';
-  $('fUrl').value = w ? (w.url || '') : '';
+  $('fYoutube').value = w ? (w.youtube || '') : '';
+  $('fVk').value = w ? (w.vk || '') : '';
   $('fDate').value = w ? w.date : today();
   $('fDistrict').value = w ? w.district : '';
   $('fTime').value = w ? w.time : '';
   $('fDur').value = w ? (w.duration || '') : '';
+  $('fViews').value = w && Number.isFinite(w.views) ? w.views : '';
   $('dHead').textContent = w ? 'Правка прогулки' : 'Новая прогулка';
   $('drawPanel').classList.add('show');
   map.getContainer().classList.add('crosshair','drawing');
   map.closePopup();
-  render();
+  render(false);
   refreshDraw();
   if(pts.length) map.fitBounds(L.latLngBounds(pts), { padding:[60,60], maxZoom:16 });
 }
@@ -375,7 +634,7 @@ function cancelDraw(){
   drawLine.setLatLngs([]); drawDots.clearLayers();
   $('drawPanel').classList.remove('show');
   map.getContainer().classList.remove('crosshair','drawing');
-  render();
+  render(false);
 }
 function saveDraw(){
   if(pts.length < 2){ $('dInfo').textContent = 'Нужно минимум 2 точки'; return; }
@@ -386,13 +645,21 @@ function saveDraw(){
     district: v('fDistrict') || 'Без района',
     time: v('fTime') || 'день',
     duration: v('fDur'),
-    url: safeUrl(v('fUrl')) || (v('fUrl') ? 'https://' + v('fUrl') : ''),
+    youtube: normUrl(v('fYoutube')),
+    vk: normUrl(v('fVk')),
     route: pts.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)])
   };
+  const vv = v('fViews');
+  if(vv !== '' && Number.isFinite(+vv) && +vv >= 0) rec.views = Math.round(+vv);
   let id;
   if(editId != null){
     const i = walks.findIndex(w => w.id === editId);
-    id = walks[i].id; walks[i] = { id, ...rec };
+    const old = walks[i];
+    id = old.id;
+    const nw = { ...old, ...rec, id };
+    if(!('views' in rec)) delete nw.views;
+    if(JSON.stringify(old.route) !== JSON.stringify(nw.route)) delete nw.km;   /* маршрут изменился — дистанцию считаем заново */
+    walks[i] = nw;
   } else { id = nextId(); walks.push({ id, ...rec }); }
   saveDraft();
   drawing = false; editId = null; pts = [];
@@ -401,7 +668,8 @@ function saveDraw(){
   map.getContainer().classList.remove('crosshair','drawing');
   activeId = null;
   rebuild();
-  select(id, true);
+  select(id, true, true);
+  play('success');
 }
 map.on('click', e => { if(!drawing) return; pts.push([e.latlng.lat, e.latlng.lng]); refreshDraw(); });
 $('dUndo').addEventListener('click', () => { pts.pop(); refreshDraw(); });
@@ -418,12 +686,12 @@ $('aDel').addEventListener('click', () => {
   const w = walks.find(x => x.id === activeId); if(!w) return;
   if(!confirm(`Удалить прогулку «${w.title}» полностью?`)) return;
   walks = walks.filter(x => x.id !== activeId);
-  activeId = null; saveDraft(); rebuild();
+  activeId = null; saveDraft(); rebuild(); play('remove');
 });
 $('aReset').addEventListener('click', () => {
   if(!confirm('Отменить все правки и вернуть список из файла?')) return;
   cancelDraw(); store.del(KEY_DRAFT);
-  walks = clone(WALKS); activeId = null; rebuild();
+  walks = freshWalks(); activeId = null; rebuild();
 });
 
 /* ---------- выгрузка списка в файл ---------- */
@@ -431,7 +699,7 @@ function exportText(){
   const q = JSON.stringify;
   const rows = walks.map(w =>
 `  { id:${w.id}, title:${q(w.title)}, date:${q(w.date)}, district:${q(w.district)}, time:${q(w.time)}, duration:${q(w.duration || '')},
-    url:${q(w.url || '')},${w.km != null ? ` km:${w.km},` : ''}
+    youtube:${q(w.youtube || '')}, vk:${q(w.vk || '')},${w.km != null ? ` km:${w.km},` : ''}${Number.isFinite(w.views) ? ` views:${w.views},` : ''}
     route:${q(w.route)} }`);
   return `const WALKS = [\n${rows.join(',\n')}\n];`;
 }
@@ -442,6 +710,13 @@ $('aExport').addEventListener('click', () => {
   $('exportPanel').classList.add('show');
 });
 $('xClose').addEventListener('click', closeExport);
+$('xCopy').addEventListener('click', async () => {
+  const t = $('exportOut').value;
+  try{ await navigator.clipboard.writeText(t); }
+  catch(_){ $('exportOut').select(); document.execCommand('copy'); }
+  $('xInfo').textContent = 'Скопировано ✔';
+  play('success');
+});
 /* собирает страницу целиком: берёт её исходник с сайта и подставляет новый список прогулок */
 function buildPage(src){
   const start = src.indexOf('\nconst WALKS = [\n');
@@ -461,16 +736,21 @@ $('xDownload').addEventListener('click', async () => {
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     $('xInfo').textContent = 'Файл index.html скачан ✔';
+    play('success');
   }catch(_){ $('xInfo').textContent = 'Не получилось собрать файл — скопируй текст ниже.'; }
 });
-$('xCopy').addEventListener('click', async () => {
-  const t = $('exportOut').value;
-  try{ await navigator.clipboard.writeText(t); }
-  catch(_){ $('exportOut').select(); document.execCommand('copy'); }
-  $('xInfo').textContent = 'Скопировано ✔';
-});
+
+/* ---------- кнопка поддержки (выключена, пока нет настоящей ссылки) ---------- */
+function buildSupport(){
+  const u = safeUrl(SUPPORT_URL);
+  $('support').innerHTML = u
+    ? `<a class="sup-btn" href="${esc(u)}" target="_blank" rel="noopener">💛 Поддержать канал</a>`
+    : `<button class="sup-btn off" disabled title="Скоро: ссылка для поддержки ещё не добавлена">💛 Поддержать канал <small>— скоро</small></button>`;
+}
 
 /* ---------- старт ---------- */
+updateSndBtn();
+buildSupport();
 setAdmin(location.hash === '#admin' || store.get(KEY_ADMIN) === '1');
 </script>
 </body>
