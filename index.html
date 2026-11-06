@@ -83,7 +83,13 @@
   .empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:14px}
 
   .aside-foot{padding:10px 12px;border-top:1px solid var(--line)}
-  .goal{padding:8px 11px;margin-bottom:8px;border-radius:10px;background:rgba(255,138,61,.14);border:1px solid rgba(255,138,61,.4);font-size:13px;line-height:1.35}
+  .goal{padding:9px 11px;margin-bottom:8px;border-radius:10px;background:rgba(255,138,61,.12);border:1px solid rgba(255,138,61,.32);font-size:13px;line-height:1.35}
+  .goal-sums{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:7px;font-variant-numeric:tabular-nums}
+  .goal-sums b{font-size:17px;color:#ffb347}
+  .goal-sums span,.goal-foot{font-size:11px;color:var(--muted)}
+  .goal-track{height:8px;margin-top:7px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+  .goal-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff8a3d,#ffc06a);box-shadow:0 0 10px rgba(255,155,69,.35);transition:width .45s ease}
+  .goal-foot{display:flex;justify-content:space-between;gap:8px;margin-top:5px}
   .sup-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--accent);background:linear-gradient(90deg,rgba(255,138,61,.18),rgba(255,95,143,.18));color:var(--text);font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;transition:filter .2s,transform .1s}
   a.sup-btn:hover{filter:brightness(1.2)}
   .sup-btn.off{border-style:dashed;border-color:var(--line);background:transparent;color:var(--muted);cursor:not-allowed}
@@ -99,17 +105,25 @@
   .abtn:disabled{opacity:.4;cursor:not-allowed}
   .abtn.danger{border-color:#7a3340;color:#ff9aa8}
   .abtn.primary{background:var(--accent);border-color:var(--accent);color:#1b1000;font-weight:700}
-  #aGoal{width:100%;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:12px}
+  #aGoal,#aGoalTarget,#aGoalRaised{width:100%;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:12px}
   #aNote{font-size:11px;color:var(--muted);line-height:1.4}
 
   /* ---------- карта ---------- */
   #map{flex:1;min-width:0;background:#e8e4dc}
   .leaflet-container{font-family:inherit}
   .route-glow{filter:blur(4px)}
+  .route-runner-wrap{background:none;border:0}
+  .route-runner{width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid #ff9b45;box-shadow:0 0 0 5px rgba(255,155,69,.2),0 0 18px rgba(255,155,69,.8)}
+  .route-player{position:absolute;z-index:1000;left:14px;bottom:14px;display:flex;gap:6px;padding:5px;border-radius:13px;background:rgba(29,23,48,.88);border:1px solid rgba(255,179,71,.35);box-shadow:0 8px 24px rgba(0,0,0,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .route-player[hidden]{display:none}
+  .route-player-btn{border:0;border-radius:9px;padding:8px 11px;background:rgba(255,179,71,.14);color:#ffe2bd;font:600 12px system-ui;cursor:pointer;transition:background .18s,transform .12s}
+  .route-player-btn:hover{background:rgba(255,179,71,.25)}
+  .route-player-btn:active{transform:scale(.96)}
+  .route-player-btn.speed{min-width:42px;color:#ffbd69}
   .mk-wrap,.poi-wrap{background:none;border:none}
   .mk{width:28px;height:28px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;line-height:1}
   .mk.start{background:#16a34a;padding-left:2px}
-  .mk.end{background:#e11d48}
+  .mk.end{background:#ffb347;color:#24170a}
   .mk.vlog{background:#7c3aed;font-size:13px}
   .poi{width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid #7a3470;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,.45);transition:transform .15s}
   .poi:hover{transform:scale(1.12)}
@@ -166,7 +180,9 @@
     .thumb{height:92px}
     .tools{padding:8px 10px;gap:8px}
     .aside-foot{padding:8px 10px}
-    .infocard{top:auto;bottom:26px;left:8px;right:8px;width:auto;max-height:190px}
+    .infocard{top:auto;bottom:70px;left:8px;right:8px;width:auto;max-height:190px}
+    .route-player{left:8px;bottom:8px}
+    .route-player-btn{padding:7px 9px}
   }
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
@@ -207,7 +223,12 @@
           <button class="abtn" id="aPoiEdit" disabled>✏️ Править точку</button>
           <button class="abtn danger" id="aPoiDel" data-nosnd="1" disabled>🗑 Удалить точку</button>
         </div>
-        <input id="aGoal" placeholder="🎯 Цель доната: на что собираешь (пусто — плашки нет)">
+        <input id="aGoal" placeholder="🎯 Цель доната: например, билет на подъёмник">
+        <div class="arow">
+          <input id="aGoalTarget" type="number" min="1" step="1" placeholder="Целевая сумма, ₽" aria-label="Целевая сумма доната" style="flex:1;min-width:110px">
+          <input id="aGoalRaised" type="number" min="0" step="1" placeholder="Уже собрано, ₽" aria-label="Уже собрано донатов" style="flex:1;min-width:110px">
+        </div>
+        <div class="pinfo">Суммы обновляются вручную. Прогресс увидят все посетители после выгрузки index.html.</div>
         <div class="arow">
           <button class="abtn" id="aExport">📋 Выгрузить в файл</button>
           <button class="abtn" id="aReset">↺ Сбросить правки</button>
@@ -222,6 +243,10 @@
 
   <div class="mapwrap">
     <div id="map"></div>
+    <div class="route-player" id="routePlayer" hidden aria-label="Управление анимацией маршрута">
+      <button class="route-player-btn" id="routeReplay" type="button" title="Повторить прорисовку маршрута">↻ <span>Повторить</span></button>
+      <button class="route-player-btn speed" id="routeSpeed" type="button" title="Скорость анимации">1×</button>
+    </div>
 
     <!-- карточка выбранной прогулки или точки интереса -->
     <div class="infocard" id="infoCard" hidden>
@@ -457,7 +482,7 @@ const WALKS = [
     ] },
   { id:32, title:"Прогулка по центру Екатеринбурга в декабре | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=KoaDS5g8Eb8&t=1142s", vk:"https://vkvideo.ru/video-226539531_456239064", views:2600,
     segments:[
-      { kind:"walk", date:"2025-12-13", start:"16:00", end:"18:00", city:"Екатеринбург", districts:["Парковый","Артек","Парковый"], note:"Вечер · Снег", weather:{"t":-3.5,"code":3,"wind":1.4,"prec":0},
+      { kind:"walk", date:"2025-12-13", start:"16:00", end:"18:00", city:"Екатеринбург", districts:["Центр"], note:"Вечер · Снег", weather:{"t":-3.5,"code":3,"wind":1.4,"prec":0},
         route:[[56.83523,60.61376],[56.83516,60.61283],[56.8352,60.6117],[56.83523,60.61162],[56.835,60.60948],[56.83476,60.60955],[56.83482,60.61012],[56.83472,60.60957],[56.83448,60.60964],[56.83392,60.60984],[56.83388,60.60966],[56.83315,60.60987],[56.83284,60.60999],[56.83277,60.60955],[56.83294,60.6095],[56.83276,60.60951],[56.83275,60.60929],[56.83284,60.60938],[56.83278,60.6092],[56.83274,60.60916],[56.83257,60.60788],[56.83205,60.60808],[56.83185,60.60802],[56.83156,60.60805],[56.83131,60.60812],[56.83093,60.60827],[56.82884,60.60898],[56.82875,60.60897],[56.82857,60.60721],[56.82816,60.60732],[56.82811,60.60697],[56.82833,60.60627],[56.82832,60.60613],[56.82824,60.60608],[56.82827,60.60586],[56.82783,60.6058],[56.82771,60.60584],[56.82772,60.60615],[56.82759,60.60621],[56.8273,60.6036],[56.82706,60.60376],[56.82718,60.60466],[56.827,60.60492],[56.82704,60.60542],[56.82659,60.60593],[56.82647,60.60637],[56.82637,60.60645],[56.82629,60.60676],[56.82532,60.60701],[56.82521,60.60707],[56.82527,60.60768],[56.82533,60.60835],[56.82551,60.60843],[56.82558,60.60857],[56.82561,60.60885],[56.8256,60.60904],[56.82567,60.60914],[56.8257,60.60929],[56.82558,60.60946],[56.82563,60.60993],[56.82556,60.61044],[56.82494,60.61116]] }
     ] },
   { id:33, title:"ВНЕЗАПНЫЙ СНЕГОПАД В КОНЦЕ НОЯБРЯ - vlog walk 4K", youtube:"https://www.youtube.com/watch?v=ofv_Ql9PRws&t=11s", vk:"https://vkvideo.ru/video-226539531_456239061",
@@ -485,7 +510,7 @@ const SITE = {
 const SUPPORT_URL = 'https://pay.cloudtips.ru/p/ae5a9fd5';
 /* Ключ YouTube Data API для автоматических просмотров. Пока пусто — просмотры не обновляются сами. */
 const YT_API_KEY = '';
-const ORANGE = '#ff8a3d', ACTIVE = '#ff2e74', CASING = '#140a24';
+const ORANGE = '#ff8a3d', ACTIVE = '#ffb347', CASING = '#211526';
 const REDUCE = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
 const map = L.map('map', { zoomControl:true }).setView([56.8389, 60.6057], 12);
@@ -584,7 +609,7 @@ function normWalk(w){
 }
 const normPoi = p => ({ id:p.id, emoji:p.emoji || '📷', title:String(p.title || ''), date:String(p.date || ''), city:String(p.city || ''), note:String(p.note || ''),
                         pos:Array.isArray(p.pos) ? p.pos : [0,0], photo:String(p.photo || '') });
-const freshData = () => ({ walks:clone(WALKS).map(normWalk), pois:clone(POIS).map(normPoi), site:{ goal:String((SITE && SITE.goal) || '') } });
+const freshData = () => ({ walks:clone(WALKS).map(normWalk), pois:clone(POIS).map(normPoi), site:{ goal:String((SITE && SITE.goal) || ''), goalTarget:Math.max(0, Number(SITE && SITE.goalTarget) || 0), goalRaised:Math.max(0, Number(SITE && SITE.goalRaised) || 0) } });
 
 /* ---------- величины, которые считаются из данных ---------- */
 const ytUrl = w => safeUrl(w.youtube), vkUrl = w => safeUrl(w.vk);
@@ -650,19 +675,39 @@ async function geocode(p){
 }
 function samplePts(r){
   if(r.length <= 1) return r.slice(0,1);
-  const km = dist(r), n = Math.max(2, Math.min(6, Math.ceil(km/1.5) + 1));
-  const cum = [0]; for(let i=1;i<r.length;i++) cum.push(cum[i-1] + dist([r[i-1], r[i]]));
+  const km = dist(r);
+  const n = Math.max(3, Math.min(12, Math.ceil(km / .75) + 1));
+  const cum = [0];
+  for(let i=1;i<r.length;i++) cum.push(cum[i-1] + dist([r[i-1], r[i]]));
   const out = [];
-  for(let k=0;k<n;k++){ const t = km * k/(n-1); let i = cum.findIndex(c => c >= t); if(i < 0) i = r.length - 1; out.push(r[i]); }
+  for(let k=0;k<n;k++){
+    const target = km * k/(n-1);
+    let i = cum.findIndex(c => c >= target);
+    if(i < 1) { out.push(r[0]); continue; }
+    if(i < 0) { out.push(r[r.length-1]); continue; }
+    const span = cum[i] - cum[i-1], f = span > 0 ? (target - cum[i-1]) / span : 0;
+    out.push([r[i-1][0] + (r[i][0]-r[i-1][0])*f, r[i-1][1] + (r[i][1]-r[i-1][1])*f]);
+  }
   return out;
+}
+function majorityLabels(values, minCount=2){
+  const counts = new Map();
+  values.map(v => String(v || '').trim()).filter(Boolean).forEach(v => counts.set(v, (counts.get(v) || 0) + 1));
+  const accepted = new Set([...counts].filter(([,n]) => n >= minCount).map(([v]) => v));
+  return dedupeSeq(values.map(v => String(v || '').trim()).filter(v => v && accepted.has(v)));
 }
 async function detectPlace(route){
   const found = [], pts = samplePts(route);
   for(let i=0;i<pts.length;i++){ if(i) await sleep(1100); const g = await geocode(pts[i]); if(g) found.push(g); }
   if(!found.length) return null;
-  const cnt = {}; found.forEach(f => { if(f.city) cnt[f.city] = (cnt[f.city] || 0) + 1; });
-  const city = Object.keys(cnt).sort((a,b) => cnt[b] - cnt[a])[0] || '';
-  return { city, districts: dedupeSeq(found.map(f => f.district).filter(Boolean)) };
+  const cityLabels = majorityLabels(found.map(f => f.city), 2);
+  const cityCounts = {};
+  found.forEach(f => { if(f.city) cityCounts[f.city] = (cityCounts[f.city] || 0) + 1; });
+  const city = Object.keys(cityCounts).sort((a,b) => cityCounts[b] - cityCounts[a])[0] || '';
+  /* Единичные подписи кварталов/микрорайонов от Nominatim отбрасываем:
+     они часто являются ближайшим локальным объектом, а не официальным районом. */
+  const districts = majorityLabels(found.map(f => f.district), 2);
+  return { city: cityLabels.length ? city : '', districts };
 }
 
 /* ---------- просмотры с YouTube (нужен ключ YT_API_KEY) ---------- */
@@ -693,13 +738,20 @@ const store = {
 const hash = s => { let h = 5381; for(let i=0;i<s.length;i++) h = ((h<<5)+h+s.charCodeAt(i))|0; return String(h); };
 const BASE_SIG = hash(JSON.stringify([WALKS, POIS, SITE]));
 const KEY_DRAFT = 'kp_draft_v1', KEY_ADMIN = 'kp_admin', KEY_SND = 'kp_sound', KEY_VIEWS = 'kp_views';
+/* Сигнатура исходной версии index(3).html: сохраняем локальный черновик при первом обновлении. */
+const LEGACY_SIG = '1748722688';
 
 function loadDraft(){
   const raw = store.get(KEY_DRAFT); if(!raw) return null;
   try{
     const d = JSON.parse(raw);
     /* если данные в файле поменялись после черновика — черновик устарел */
-    if(d.sig === BASE_SIG && Array.isArray(d.walks)) return { walks:d.walks.map(normWalk), pois:(d.pois || []).map(normPoi), site:{ goal:String((d.site && d.site.goal) || '') } };
+    if((d.sig === BASE_SIG || d.sig === LEGACY_SIG) && Array.isArray(d.walks)){
+      const loadedWalks = d.walks.map(normWalk);
+      const knownBad = loadedWalks.find(w => w.id === 32);
+      if(knownBad) knownBad.segments.forEach(seg => { if(seg.city === 'Екатеринбург' && seg.districts.join('|') === 'Парковый|Артек|Парковый') seg.districts = ['Центр']; });
+      return { walks:loadedWalks, pois:(d.pois || []).map(normPoi), site:{ goal:String((d.site && d.site.goal) || ''), goalTarget:Math.max(0, Number(d.site && d.site.goalTarget) || 0), goalRaised:Math.max(0, Number(d.site && d.site.goalRaised) || 0) } };
+    }
   }catch(_){}
   store.del(KEY_DRAFT);
   return null;
@@ -756,7 +808,7 @@ document.addEventListener('click', e => {
 
 /* ---------- состояние ---------- */
 let isAdmin = false;
-let walks = [], pois = [], site = { goal:'' };
+let walks = [], pois = [], site = { goal:'', goalTarget:0, goalRaised:0 };
 let layers = {};
 let activeId = null, activePoi = null;
 let fKind = 'all', fCity = 'Все', district = 'Все', showPois = true;
@@ -771,7 +823,7 @@ function mkIcon(cls, glyph){
 const STY = {
   normal:{ casing:{ color:CASING, weight:10, opacity:.8 },    glow:{ opacity:0 },   line:{ color:ORANGE, weight:5.5, opacity:1 },   mk:1 },
   dim:   { casing:{ color:CASING, weight:8,  opacity:.12 },   glow:{ opacity:0 },   line:{ color:ORANGE, weight:4,   opacity:.28 },  mk:.3 },
-  active:{ casing:{ color:'#ffffff', weight:13, opacity:.95 }, glow:{ opacity:.55 }, line:{ color:ACTIVE, weight:6.5, opacity:1 },   mk:1 }
+  active:{ casing:{ color:'#211526', weight:12, opacity:.98 }, glow:{ opacity:.42 }, line:{ color:ACTIVE, weight:6.5, opacity:1 },   mk:1 }
 };
 const modeOf = id => activeId == null ? 'normal' : (id === activeId ? 'active' : 'dim');
 function paintWalk(id, mode){
@@ -809,32 +861,73 @@ function buildLayers(){
       hit.on('mouseover', () => { if(!drawing){ const st = STY[modeOf(w.id)]; if(modeOf(w.id) !== 'active') line.setStyle({ weight:st.line.weight + 1.5, opacity:Math.max(st.line.opacity, .85) }); } });
       hit.on('mouseout',  () => { if(modeOf(w.id) !== 'active') line.setStyle(STY[modeOf(w.id)].line); });
       parts.push(casing, glow, line, hit, start, end);
-      segs.push({ casing, glow, line, hit, start, end });
+      segs.push({ casing, glow, line, hit, start, end, route:ll });
     });
     layers[w.id] = { segs, group: L.layerGroup(parts) };
   });
   paintAll();
 }
 /* плавная прорисовка маршрута (один path, без перерисовки карты) */
+let routeSpeed = 1, routeRunners = [], routeFrames = [];
+function stopRouteAnimation(){
+  routeFrames.forEach(id => cancelAnimationFrame(id)); routeFrames = [];
+  routeRunners.forEach(m => map.removeLayer(m)); routeRunners = [];
+  Object.values(layers).forEach(l => l.segs.forEach(clearAnim));
+}
 function clearAnim(s){
   clearTimeout(s.animT);
   const p = s.line && s.line.getElement && s.line.getElement();
   if(p){ p.style.transition = ''; p.style.strokeDasharray = ''; p.style.strokeDashoffset = ''; }
 }
+function animateRunner(route, duration){
+  if(!route || route.length < 2 || REDUCE) return;
+  const cumulative = [0];
+  for(let i=1;i<route.length;i++) cumulative.push(cumulative[i-1] + dist([route[i-1], route[i]]));
+  const total = cumulative[cumulative.length-1]; if(!(total > 0)) return;
+  const marker = L.marker(route[0], { interactive:false, keyboard:false, zIndexOffset:1200,
+    icon:L.divIcon({ className:'route-runner-wrap', html:'<div class="route-runner"></div>', iconSize:[16,16], iconAnchor:[8,8] }) }).addTo(map);
+  routeRunners.push(marker);
+  const started = performance.now();
+  const tick = now => {
+    const f = Math.min(1, (now-started)/duration), target = total*f;
+    let i = cumulative.findIndex(v => v >= target); if(i < 1) i = 1; if(i < 0) i = route.length-1;
+    const span = cumulative[i]-cumulative[i-1], part = span > 0 ? (target-cumulative[i-1])/span : 0;
+    marker.setLatLng([route[i-1][0]+(route[i][0]-route[i-1][0])*part, route[i-1][1]+(route[i][1]-route[i-1][1])*part]);
+    if(f < 1) routeFrames.push(requestAnimationFrame(tick));
+    else { setTimeout(() => { if(map.hasLayer(marker)) map.removeLayer(marker); routeRunners = routeRunners.filter(m => m !== marker); }, 350); }
+  };
+  routeFrames.push(requestAnimationFrame(tick));
+}
 function drawRoute(s){
-  if(REDUCE || !s.line) return;
+  if(!s.line) return;
+  if(REDUCE) return;
   const p = s.line.getElement(); if(!p || !p.getTotalLength) return;
   let len; try{ len = p.getTotalLength(); }catch(_){ return; }
   if(!(len > 0)) return;
   p.style.transition = 'none';
   p.style.strokeDasharray = len + ' ' + len;
   p.style.strokeDashoffset = len;
-  p.getBoundingClientRect();                                  /* принудительная перерисовка перед стартом */
-  const dur = Math.min(1600, Math.max(700, len * .9));
-  p.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.4,0,.2,1)`;
+  p.getBoundingClientRect();
+  const dur = Math.min(2600, Math.max(1100, len * 1.25)) / routeSpeed;
+  p.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.22,.72,.25,1)`;
   p.style.strokeDashoffset = 0;
-  s.animT = setTimeout(() => clearAnim(s), dur + 80);
+  s.animT = setTimeout(() => clearAnim(s), dur + 120);
+  animateRunner(s.route, dur);
 }
+function playActiveRouteAnimation(){
+  if(activeId == null) return;
+  stopRouteAnimation();
+  const l = layers[activeId]; if(!l) return;
+  if(REDUCE) return;
+  l.segs.forEach(drawRoute);
+  play('success');
+}
+$('routeReplay').addEventListener('click', playActiveRouteAnimation);
+$('routeSpeed').addEventListener('click', () => {
+  routeSpeed = routeSpeed === 1 ? 1.35 : routeSpeed === 1.35 ? .72 : 1;
+  $('routeSpeed').textContent = routeSpeed === 1 ? '1×' : routeSpeed === 1.35 ? '1.35×' : '0.7×';
+  $('routeSpeed').title = `Скорость анимации: ${$('routeSpeed').textContent}`;
+});
 
 /* ---------- точки интереса ---------- */
 const poiLayer = L.layerGroup().addTo(map);
@@ -863,6 +956,7 @@ function poiInfoHtml(p){
 }
 function selectPoi(id){
   const p = pois.find(x => x.id === id); if(!p) return;
+  stopRouteAnimation(); $('routePlayer').hidden = true;
   selStamp = Date.now();
   activePoi = id;
   if(activeId != null){ activeId = null; paintAll(); markActive(); }
@@ -988,7 +1082,7 @@ function cardHtml(w, i){
 function render(animate){
   const vis = visible(), ids = new Set(vis.map(w => w.id));
   /* выбранная прогулка пропала из списка (фильтр/поиск) — снимаем выбор, чтобы «Удалить/Править» не трогали скрытую */
-  if(activeId != null && !ids.has(activeId)){ activeId = null; paintAll(); hideInfo(); }
+  if(activeId != null && !ids.has(activeId)){ stopRouteAnimation(); $('routePlayer').hidden = true; activeId = null; paintAll(); hideInfo(); }
   walks.forEach(w => {
     const l = layers[w.id]; if(!l) return;
     const show = ids.has(w.id) && !(drawing && editId === w.id);   /* редактируемую прячем, чтобы не мешала */
@@ -999,7 +1093,7 @@ function render(animate){
   renderStats(vis);
   updateAdminUI();
 }
-function rebuild(){ buildLayers(); buildPois(); buildFilters(); render(true); buildSupport(); $('aGoal').value = site.goal || ''; }
+function rebuild(){ buildLayers(); buildPois(); buildFilters(); render(true); buildSupport(); $('aGoal').value = site.goal || ''; $('aGoalTarget').value = site.goalTarget || ''; $('aGoalRaised').value = site.goalRaised || ''; }
 
 /* обложка не загрузилась — показываем красивую заглушку */
 $('list').addEventListener('error', e => {
@@ -1025,6 +1119,8 @@ const infoPad = () => innerWidth <= 800
 function walkPoints(w){ return w.segments.flatMap(s => s.route); }
 function select(id, fly, quiet){
   const l = layers[id], w = walks.find(x => x.id === id); if(!l || !w) return;
+  stopRouteAnimation();
+  $('routePlayer').hidden = REDUCE;
   selStamp = Date.now();
   activePoi = null;
   activeId = id;
@@ -1037,11 +1133,13 @@ function select(id, fly, quiet){
   if(fly && all.length) map.fitBounds(L.latLngBounds(all), { ...infoPad(), maxZoom:16, animate:!REDUCE });
   setTimeout(() => {
     if(token !== animToken || activeId !== id) return;        /* пока ждали, выбрали другую — ничего не делаем */
-    l.segs.forEach(drawRoute);
+    playActiveRouteAnimation();
   }, fly && !REDUCE ? 500 : 0);
   updateAdminUI();
 }
 function deselect(){
+  stopRouteAnimation();
+  $('routePlayer').hidden = true;
   activeId = null; activePoi = null;
   animToken++;
   paintAll(); hideInfo(); markActive(); updateAdminUI();
@@ -1073,7 +1171,13 @@ $('logo').addEventListener('click', () => {
   if(taps.length >= 5){ taps = []; setAdmin(!isAdmin); }
 });
 $('aExit').addEventListener('click', () => setAdmin(false));
-$('aGoal').addEventListener('change', () => { site.goal = $('aGoal').value.trim(); saveDraft(); buildSupport(); updateAdminUI(); });
+function saveGoalSettings(){
+  site.goal = $('aGoal').value.trim();
+  site.goalTarget = Math.max(0, Math.floor(Number($('aGoalTarget').value) || 0));
+  site.goalRaised = Math.max(0, Math.floor(Number($('aGoalRaised').value) || 0));
+  saveDraft(); buildSupport(); updateAdminUI();
+}
+['aGoal','aGoalTarget','aGoalRaised'].forEach(id => $(id).addEventListener('change', saveGoalSettings));
 
 /* ---------- создание / правка видео и его маршрутов ---------- */
 const drawLine = L.polyline([], { color:'#2a9df4', weight:4, dashArray:'6 6', interactive:false }).addTo(map);
@@ -1171,7 +1275,7 @@ async function saveDraw(){
   /* что не заполнено — определяем сами (бесплатные сервисы; не получилось — просто сохраняем как есть) */
   try{
     for(const s of draft.segments){
-      if(!s.city && !s.districts.length){ $('dInfo').textContent = 'Определяю город и районы…'; const g = await detectPlace(s.route); if(g){ s.city = g.city; s.districts = g.districts; } }
+      if(!s.city || !s.districts.length){ $('dInfo').textContent = 'Определяю город и районы…'; const g = await detectPlace(s.route); if(g){ if(!s.city) s.city = g.city; if(!s.districts.length) s.districts = g.districts; } }
       if(!s.weather && s.date && s.start){ $('dInfo').textContent = 'Узнаю погоду…'; const wx = await fetchWeather(s.route[0][0], s.route[0][1], s.date, s.start); if(wx) s.weather = wx; }
     }
   }catch(_){}
@@ -1342,7 +1446,7 @@ function exportBlocks(){
   return {
     walks:`const WALKS = [\n${walks.map(walkText).join(',\n')}\n];`,
     pois:`const POIS = [\n${pois.map(poiText).join(',\n')}\n];`,
-    site:`const SITE = {\n  goal: ${q(site.goal || '')}\n};`
+    site:`const SITE = {\n  goal: ${q(site.goal || '')},\n  goalTarget: ${Math.max(0, Number(site.goalTarget) || 0)},\n  goalRaised: ${Math.max(0, Number(site.goalRaised) || 0)}\n};`
   };
 }
 let exportFull = '';
@@ -1394,7 +1498,10 @@ $('xDownload').addEventListener('click', async () => {
 /* ---------- кнопка поддержки и цель доната ---------- */
 function buildSupport(){
   const u = safeUrl(SUPPORT_URL), goal = String(site.goal || '').trim();
-  $('support').innerHTML = (goal ? `<div class="goal">🎯 <b>Цель:</b> ${esc(goal)}</div>` : '')
+  const target = Math.max(0, Number(site.goalTarget) || 0), raised = Math.max(0, Number(site.goalRaised) || 0);
+  const pct = target > 0 ? Math.min(100, Math.round(raised / target * 100)) : 0;
+  const goalHtml = goal ? `<div class="goal"><div>🎯 <b>Цель:</b> ${esc(goal)}</div>${target > 0 ? `<div class="goal-sums"><b>${fmtNum(raised)} ₽</b><span>из ${fmtNum(target)} ₽</span></div><div class="goal-track"><i style="width:${pct}%"></i></div><div class="goal-foot"><span>${pct}% собрано</span><span>${raised >= target ? 'Цель достигнута!' : `Осталось ${fmtNum(target-raised)} ₽`}</span></div>` : ''}</div>` : '';
+  $('support').innerHTML = goalHtml
     + (u ? `<a class="sup-btn" href="${esc(u)}" target="_blank" rel="noopener">💛 Поддержать канал</a>`
          : `<button class="sup-btn off" disabled title="Скоро: ссылка для поддержки ещё не добавлена">💛 Поддержать канал <small>— скоро</small></button>`);
 }
