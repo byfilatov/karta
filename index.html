@@ -13,7 +13,7 @@
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
   body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
-  button{font-family:inherit}
+  button,input,select,textarea{font-family:inherit}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
   /* ---------- шапка и статистика ---------- */
@@ -34,14 +34,23 @@
 
   main{flex:1;display:flex;min-height:0}
   aside{width:380px;max-width:100%;background:var(--panel);display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
-  .tools{padding:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+  .tools{padding:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
   .tools input[type=search]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:14px;transition:border-color .2s}
   .tools input[type=search]:focus{outline:none;border-color:var(--accent)}
+  .seg{display:flex;gap:4px;background:var(--panel2);padding:3px;border-radius:11px}
+  .seg button{flex:1;padding:6px 4px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:background .2s,color .2s}
+  .seg button:hover{color:var(--text)}
+  .seg button.on{background:var(--accent);color:#1b1000;font-weight:700}
   .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips:empty{display:none}
   .chip{padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:background .2s,color .2s,border-color .2s,transform .1s}
   .chip:hover{border-color:var(--accent);color:var(--text)}
   .chip:active{transform:scale(.96)}
   .chip.on{background:var(--accent);border-color:var(--accent);color:#1b1000;font-weight:600}
+  .chip .cnt{opacity:.65;margin-left:5px;font-size:11px}
+  .chips.sub .chip{font-size:11px;padding:4px 10px}
+  .poitog{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none}
+  .poitog input{accent-color:var(--accent)}
 
   /* ---------- карточки прогулок ---------- */
   .list{flex:1;overflow:auto;padding:10px;scroll-behavior:smooth}
@@ -63,16 +72,18 @@
   .thumb .shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,8,28,.95) 0%,rgba(14,8,28,.55) 42%,rgba(14,8,28,.05) 78%)}
   .thumb h3{position:absolute;left:12px;right:12px;bottom:9px;margin:0;font-size:15px;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,.8);
             display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .kind{position:absolute;left:10px;top:9px;padding:3px 9px;border-radius:999px;background:rgba(14,8,28,.72);color:#fff;font-size:11px}
   .cbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:9px 12px}
   .meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:3px 10px;min-width:0;flex:1 1 150px}
   .vb{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
   .watch{flex:none;padding:7px 12px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#1b0a00;font-weight:700;font-size:12px;text-decoration:none;white-space:nowrap;transition:filter .2s,transform .1s}
-  .watch.vk,.pop a.vk{background:#0077ff;color:#fff}
+  .watch.vk{background:#0077ff;color:#fff}
   .watch:hover{filter:brightness(1.1)}
   .watch:active{transform:scale(.96)}
   .empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:14px}
 
   .aside-foot{padding:10px 12px;border-top:1px solid var(--line)}
+  .goal{padding:8px 11px;margin-bottom:8px;border-radius:10px;background:rgba(255,138,61,.14);border:1px solid rgba(255,138,61,.4);font-size:13px;line-height:1.35}
   .sup-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--accent);background:linear-gradient(90deg,rgba(255,138,61,.18),rgba(255,95,143,.18));color:var(--text);font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;transition:filter .2s,transform .1s}
   a.sup-btn:hover{filter:brightness(1.2)}
   .sup-btn.off{border-style:dashed;border-color:var(--line);background:transparent;color:var(--muted);cursor:not-allowed}
@@ -88,33 +99,52 @@
   .abtn:disabled{opacity:.4;cursor:not-allowed}
   .abtn.danger{border-color:#7a3340;color:#ff9aa8}
   .abtn.primary{background:var(--accent);border-color:var(--accent);color:#1b1000;font-weight:700}
+  #aGoal{width:100%;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:12px}
   #aNote{font-size:11px;color:var(--muted);line-height:1.4}
 
   /* ---------- карта ---------- */
   #map{flex:1;min-width:0;background:#e8e4dc}
   .leaflet-container{font-family:inherit}
-  .leaflet-popup-content-wrapper{background:var(--panel);color:var(--text);border-radius:14px}
-  .leaflet-popup-tip{background:var(--panel)}
-  .pop h3{margin:0 0 6px;font-size:16px}
-  .pop .meta{margin-bottom:10px}
-  .pop .vb{margin-left:0}
-  .pop a{display:inline-block;padding:8px 14px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#1b0a00;font-weight:700;text-decoration:none;font-size:13px}
   .route-glow{filter:blur(4px)}
-  .mk-wrap{background:none;border:none}
+  .mk-wrap,.poi-wrap{background:none;border:none}
   .mk{width:28px;height:28px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;line-height:1}
   .mk.start{background:#16a34a;padding-left:2px}
   .mk.end{background:#e11d48}
-  .drawing .mk-wrap{pointer-events:none!important}
+  .mk.vlog{background:#7c3aed;font-size:13px}
+  .poi{width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid #7a3470;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,.45);transition:transform .15s}
+  .poi:hover{transform:scale(1.12)}
+  .drawing .mk-wrap,.drawing .poi-wrap{pointer-events:none!important}
 
-  .panel{position:absolute;left:12px;bottom:12px;z-index:1000;width:min(430px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:12px;display:none}
+  /* карточка выбранной прогулки / точки: сбоку и полупрозрачная, чтобы не закрывать маршрут */
+  .infocard{position:absolute;z-index:1100;right:12px;top:12px;width:min(340px,calc(100% - 24px));max-height:calc(100% - 52px);overflow:auto;padding:14px 14px 12px;border-radius:16px;
+            background:rgba(29,23,48,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.14);box-shadow:0 10px 30px rgba(0,0,0,.4);animation:cardIn .25s ease}
+  .infocard[hidden]{display:none}
+  .infocard .x{position:absolute;right:8px;top:5px;border:0;background:transparent;color:var(--muted);font-size:24px;line-height:1;cursor:pointer;padding:2px 6px}
+  .infocard .x:hover{color:#fff}
+  .infocard h3{margin:0 26px 8px 0;font-size:16px;line-height:1.25}
+  .segb{padding:8px 0;border-top:1px solid rgba(255,255,255,.1);font-size:13px;line-height:1.45}
+  .segh{font-weight:700}
+  .segm{color:var(--muted)}
+  .segw{color:#ffe9d6}
+  .infocard .vb{margin:8px 0 0}
+  .credit{margin-top:8px;font-size:10px;color:var(--muted)}
+  .credit a{color:var(--muted)}
+  img.pphoto{display:block;width:100%;max-height:210px;object-fit:cover;border-radius:10px;margin:4px 0 8px}
+
+  .panel{position:absolute;left:12px;bottom:12px;z-index:1000;width:min(440px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;background:var(--panel);border:1px solid var(--accent);border-radius:14px;padding:12px;display:none}
   .panel.show{display:block;animation:cardIn .25s ease}
   .panel p{margin:0 0 8px;font-size:13px;color:var(--muted);line-height:1.4}
   .panel .row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
-  .panel .info{font-size:12px;color:var(--muted)}
+  .pinfo{font-size:12px;color:var(--muted)}
   .fields{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
-  .fields input{padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:12px;min-width:0}
-  .fields input:nth-child(-n+3){grid-column:1 / -1}
-  #exportOut{width:100%;height:170px;background:#0f0b1a;color:#cfe;border:1px solid var(--line);border-radius:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;padding:8px}
+  .fields input,.fields select,.fields textarea{padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:12px;min-width:0;width:100%}
+  .fields .full{grid-column:1 / -1}
+  .fields label{font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:3px;min-width:0}
+  .segtabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+  .segtabs button{padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-size:12px;cursor:pointer}
+  .segtabs button.on{background:var(--accent);border-color:var(--accent);color:#1b1000;font-weight:700}
+  #exportOut{width:100%;height:150px;background:#0f0b1a;color:#cfe;border:1px solid var(--line);border-radius:8px;font-family:ui-monospace,Consolas,monospace;font-size:11px;padding:8px}
+  #pPrev img{display:block;max-width:100%;max-height:120px;border-radius:8px;margin-bottom:8px}
   .mapwrap{position:relative;flex:1;display:flex;min-width:0}
   .crosshair{cursor:crosshair!important}
   .drawing path.leaflet-interactive{pointer-events:none!important}
@@ -131,11 +161,12 @@
     .stextra{display:none}
     main{flex-direction:column-reverse}
     aside{width:100%;height:46vh;border-right:none;border-top:1px solid var(--line);overflow-y:auto;-webkit-overflow-scrolling:touch}
-    .list{flex:none;overflow:visible}      /* на телефоне прокручивается вся нижняя панель: админ-кнопки уезжают вверх и не съедают список */
+    .list{flex:none;overflow:visible}      /* на телефоне прокручивается вся нижняя панель */
     .mapwrap{height:54vh;flex:none}
     .thumb{height:92px}
     .tools{padding:8px 10px;gap:8px}
     .aside-foot{padding:8px 10px}
+    .infocard{top:auto;bottom:26px;left:8px;right:8px;width:auto;max-height:190px}
   }
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
@@ -156,7 +187,14 @@
   <aside>
     <div class="tools">
       <input type="search" id="q" placeholder="Поиск по названию…">
-      <div class="chips" id="chips"></div>
+      <div class="seg" id="kindSeg">
+        <button class="on" data-k="all">Все</button>
+        <button data-k="walk">🚶 Прогулки</button>
+        <button data-k="vlog">🎬 Влоги</button>
+      </div>
+      <div class="chips" id="cityChips"></div>
+      <div class="chips sub" id="distChips"></div>
+      <label class="poitog" id="poiTog"><input type="checkbox" id="poiChk" checked> 📍 Точки интереса <span id="poiCnt"></span></label>
 
       <div id="adminBox">
         <div class="arow">
@@ -164,6 +202,12 @@
           <button class="abtn" id="aEdit" disabled>✏️ Править</button>
           <button class="abtn danger" id="aDel" data-nosnd="1" disabled>🗑 Удалить</button>
         </div>
+        <div class="arow">
+          <button class="abtn primary" id="aPoiNew">📍 Новая точка интереса</button>
+          <button class="abtn" id="aPoiEdit" disabled>✏️ Править точку</button>
+          <button class="abtn danger" id="aPoiDel" data-nosnd="1" disabled>🗑 Удалить точку</button>
+        </div>
+        <input id="aGoal" placeholder="🎯 Цель доната: на что собираешь (пусто — плашки нет)">
         <div class="arow">
           <button class="abtn" id="aExport">📋 Выгрузить в файл</button>
           <button class="abtn" id="aReset">↺ Сбросить правки</button>
@@ -179,38 +223,87 @@
   <div class="mapwrap">
     <div id="map"></div>
 
-    <!-- панель создания / правки маршрута -->
+    <!-- карточка выбранной прогулки или точки интереса -->
+    <div class="infocard" id="infoCard" hidden>
+      <button class="x" id="infoX" aria-label="Закрыть" data-nosnd="1">×</button>
+      <div id="infoBody"></div>
+    </div>
+
+    <!-- панель создания / правки прогулки -->
     <div class="panel" id="drawPanel">
-      <p><b id="dHead">Новая прогулка</b><br>Кликай по карте вдоль маршрута — ставятся точки. Точку можно перетащить, правый клик по точке удаляет её.</p>
+      <p><b id="dHead">Новая прогулка</b></p>
       <div class="fields">
-        <input id="fTitle" placeholder="Название прогулки">
-        <input id="fYoutube" placeholder="Ссылка на YouTube (по желанию) — вставь сюда">
-        <input id="fVk" placeholder="Ссылка на VK Видео (по желанию) — вставь сюда">
-        <input id="fDate" type="date">
-        <input id="fDistrict" placeholder="Район">
-        <input id="fTime" placeholder="Время суток: вечер">
-        <input id="fDur" placeholder="Длительность: 1:05">
-        <input id="fViews" type="number" min="0" step="1" placeholder="Просмотры (по желанию)">
+        <input class="full" id="fTitle" placeholder="Название видео">
+        <input class="full" id="fYoutube" placeholder="Ссылка на YouTube (по желанию) — вставь сюда">
+        <input class="full" id="fVk" placeholder="Ссылка на VK Видео (по желанию) — вставь сюда">
+      </div>
+      <p style="margin-bottom:4px">Маршруты этого видео (если снимал в разные дни или в разных местах — добавь ещё один):</p>
+      <div class="segtabs" id="segTabs"></div>
+      <p id="segHint">Кликай по карте вдоль маршрута. Точку можно перетащить, правый клик по точке удаляет её.</p>
+      <div class="fields">
+        <select class="full" id="fKind">
+          <option value="walk">🚶 Прогулка (маршрут из 2+ точек)</option>
+          <option value="vlog">🎬 Влог (можно одна точка на карте)</option>
+        </select>
+        <label>Дата<input id="fDate" type="date"></label>
+        <label>Снимал с…<input id="fStart" type="time"></label>
+        <label>…до<input id="fEnd" type="time"></label>
+        <label>Город или место<input id="fCity" placeholder="определится само"></label>
+        <label class="full">Районы по порядку, через запятую<input id="fDistricts" placeholder="определятся сами"></label>
+        <label class="full">Заметка для зрителей (по желанию)<input id="fNote" placeholder="например: дождь, снег, ЛОГ"></label>
+        <label class="full">Заметка для себя (зрители не видят)<input id="fAdmin" placeholder="например: поправить маршрут"></label>
       </div>
       <div class="row">
+        <button class="abtn" id="dGeo">📍 Определить город и районы</button>
+        <button class="abtn" id="dWeather">☁️ Погода на время съёмки</button>
+      </div>
+      <div class="pinfo" id="fWeather" style="margin-bottom:8px"></div>
+      <div class="row">
         <button class="abtn" id="dUndo">↶ Убрать последнюю</button>
-        <button class="abtn danger" id="dClear">Стереть маршрут</button>
+        <button class="abtn danger" id="dClear">Стереть этот маршрут</button>
+        <button class="abtn danger" id="dSegDel" data-nosnd="1">Удалить маршрут из видео</button>
       </div>
       <div class="row">
         <button class="abtn primary" id="dSave" data-nosnd="1">✔ Сохранить</button>
         <button class="abtn" id="dCancel">Отмена</button>
-        <span class="info" id="dInfo"></span>
+        <span class="pinfo" id="dInfo"></span>
       </div>
     </div>
 
-    <!-- панель выгрузки списка в файл -->
+    <!-- панель точки интереса -->
+    <div class="panel" id="poiPanel">
+      <p><b id="pHead">Точка интереса</b><br><span id="pHint">Кликни по карте, где это было. Точку можно перетащить.</span></p>
+      <div class="fields">
+        <select class="full" id="pEmoji">
+          <option value="📷">📷 Интересное место</option>
+          <option value="☕">☕ Кофе / еда</option>
+          <option value="🛍">🛍 Покупка</option>
+          <option value="⭐">⭐ Другое</option>
+        </select>
+        <input class="full" id="pTitle" placeholder="Что это? Например: Купил очки">
+        <label>Дата<input id="pDate" type="date"></label>
+        <label>Город (по желанию)<input id="pCity" placeholder="Екатеринбург"></label>
+        <label class="full">Заметка (по желанию)<input id="pNote" placeholder="пара слов"></label>
+        <label class="full">Фото с компьютера или телефона<input id="pPhotoFile" type="file" accept="image/*"></label>
+        <label class="full">…или ссылка на фото в интернете<input id="pPhotoUrl" placeholder="https://…"></label>
+      </div>
+      <div id="pPrev"></div>
+      <div class="row">
+        <button class="abtn primary" id="pSave" data-nosnd="1">✔ Сохранить</button>
+        <button class="abtn" id="pCancel">Отмена</button>
+        <button class="abtn" id="pPhotoDel">Убрать фото</button>
+        <span class="pinfo" id="pInfo"></span>
+      </div>
+    </div>
+
+    <!-- панель выгрузки в файл -->
     <div class="panel" id="exportPanel">
-      <p><b>Выгрузка списка.</b> Проще всего: нажми «Скачать готовый index.html» и загрузи этот файл на GitHub (Add file → Upload files; у файла должно быть имя именно <code>index.html</code>, без цифр в скобках). Если кнопка не сработала — скопируй текст ниже и вставь его в файл вместо старого блока списка прогулок.</p>
+      <p><b>Выгрузка.</b> Нажми «Скачать готовый index.html» и загрузи этот файл на GitHub (Add file → Upload files; имя файла должно быть именно <code>index.html</code>, без цифр в скобках). Если кнопка не сработала — скопируй текст ниже и пришли мне, я вставлю его в файл.</p>
       <div class="row">
         <button class="abtn primary" id="xDownload" data-nosnd="1">⬇ Скачать готовый index.html</button>
         <button class="abtn" id="xCopy" data-nosnd="1">Скопировать текст</button>
         <button class="abtn" id="xClose">Закрыть</button>
-        <span class="info" id="xInfo"></span>
+        <span class="pinfo" id="xInfo"></span>
       </div>
       <textarea id="exportOut" readonly></textarea>
     </div>
@@ -220,114 +313,178 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 /* =====================================================================
-   СПИСОК ПРОГУЛОК, КОТОРЫЙ ВИДЯТ ЗРИТЕЛИ.
+   ДАННЫЕ КАРТЫ. Обычно руками их править не нужно: включи админ-режим
+   (5 быстрых кликов по заголовку «КАРТА ПРОГУЛОК» или #admin в конце адреса),
+   правь всё кнопками слева, потом «Выгрузить в файл» → «Скачать готовый index.html»
+   и загрузи файл на GitHub.
 
-   Как добавлять и править прогулки:
-   1) Включи админ-режим: быстро кликни 5 раз по заголовку «КАРТА ПРОГУЛОК»
-      (или допиши #admin в конец адреса страницы).
-   2) Создавай, правь и удаляй маршруты кнопками слева — прямо на карте.
-   3) Нажми «Выгрузить в файл» → «Скачать готовый index.html» и загрузи файл на GitHub.
-   Дистанция считается сама по точкам (можно задать вручную: km:5.2).
-   Необязательное поле views:1234 — число просмотров, которое ты вписываешь сам.
-   Ссылки на видео: youtube:"..." и vk:"..." — можно обе, одну или ни одной.
-   (Старое поле url:"..." тоже читается: оно считается ссылкой на YouTube.)
+   У каждого видео (WALKS) есть ссылки youtube / vk и список маршрутов segments.
+   Один маршрут = один день и одно место. У маршрута: kind ("walk" прогулка или
+   "vlog" влог), date, start/end (время съёмки «с — до»), city, districts (районы
+   по порядку), note (заметка для зрителей), adminNote (заметка для себя, зрители её
+   не видят), weather (погода), route (точки на карте).
    ===================================================================== */
 const WALKS = [
-  { id:6, title:"Прогулка по Екатеринбургу: от Ленина до Восточной. Шарташский рынок | 24 октября | 4K Walking Vlog", date:"2026-10-29", district:"Центр", time:"день", duration:"",
-    youtube:"https://www.youtube.com/watch?v=lxo1IqUWjqQ&t=1532s", vk:"https://vkvideo.ru/video-226539531_456239119",
-    route:[[56.83847,60.62402],[56.83915,60.62377],[56.83919,60.62422],[56.83935,60.62491],[56.83972,60.62491],[56.83967,60.62414],[56.83986,60.62404],[56.84005,60.62537],[56.84068,60.62577],[56.84102,60.6288],[56.84057,60.62921],[56.8411,60.62952],[56.84143,60.63203],[56.83816,60.63328],[56.83553,60.63425],[56.83368,60.63487],[56.8308,60.63593],[56.83058,60.63654],[56.83016,60.63699],[56.83039,60.63866],[56.82992,60.6389],[56.82965,60.63724],[56.82901,60.63681],[56.82655,60.63781]] },
-  { id:7, title:"Прогулка по Екатеринбургу: от ул. Луначарского до Сада им. Энгельса", date:"2026-10-24", district:"Без района", time:"День", duration:"",
-    youtube:"https://www.youtube.com/watch?v=x03Uom1dEKE", vk:"https://vkvideo.ru/video-226539531_456239118", views:0,
-    route:[[56.82742,60.62639],[56.82733,60.62532],[56.82834,60.62493],[56.82834,60.62493],[56.83138,60.62386],[56.83625,60.62202],[56.8369,60.62743],[56.8366,60.6272],[56.83558,60.62765],[56.83625,60.62602],[56.83642,60.62643]] },
-  { id:8, title:"Прогулка по Екатеринбургу: от улицы Архангела Михаила до Шаумяна через ТЦ МЕГА", date:"2026-10-20", district:"ВИЗ", time:"день", duration:"",
-    youtube:"https://www.youtube.com/watch?v=-kqbVbsluDQ&t=37s", vk:"https://vkvideo.ru/video-226539531_456239116",
-    route:[[56.81808,60.51054],[56.81819,60.51001],[56.81924,60.50997],[56.82034,60.50791],[56.82138,60.50907],[56.82277,60.50903],[56.82323,60.50899],[56.82334,60.50694],[56.82482,60.50686],[56.82529,60.50652],[56.82509,60.50618],[56.8252,60.50545],[56.82488,60.5045],[56.82491,60.50337],[56.82496,60.50038],[56.82581,60.50149],[56.82614,60.51255],[56.82711,60.52979],[56.82765,60.53048],[56.82733,60.53632],[56.82749,60.53637],[56.82715,60.54151],[56.82696,60.5415],[56.8268,60.54369],[56.82467,60.54319],[56.82366,60.54589],[56.82349,60.54763],[56.82132,60.55262],[56.81944,60.55738],[56.81721,60.56344],[56.81585,60.56718]] },
-  { id:9, title:"Прогулка по Екатеринбургу: ул.Малышева | Шарташские Каменные Палатки", date:"2026-10-14", district:"Втузгородок", time:"День", duration:"",
-    youtube:"https://www.youtube.com/watch?v=lEkbFP5gGtk&t=516s", vk:"",
-    route:[[56.84358,60.65208],[56.84294,60.65117],[56.84037,60.65193],[56.84023,60.65199],[56.84016,60.65177],[56.83897,60.65222],[56.83867,60.6496],[56.83884,60.65188],[56.83767,60.65232],[56.83771,60.65267],[56.83239,60.65456],[56.83234,60.65483],[56.83345,60.65468],[56.83349,60.65516],[56.83333,60.65579],[56.83303,60.65583],[56.83295,60.65581],[56.83263,60.65595],[56.83246,60.65619],[56.83247,60.6565],[56.83257,60.65683],[56.83251,60.65709],[56.83184,60.65712],[56.83276,60.65722],[56.83297,60.65641],[56.83329,60.65632],[56.83336,60.6558],[56.83357,60.65573],[56.83368,60.65677],[56.83378,60.6576],[56.83331,60.65787],[56.83345,60.65926],[56.83352,60.65981],[56.83382,60.65992],[56.83416,60.65979],[56.83435,60.65992]] },
-  { id:10, title:"Прогулка по Екатеринбургу: УГМК-Арена - Маркет Маркета - ул.Степана Разина", date:"2026-09-02", district:"Центр", time:"День", duration:"",
-    youtube:"https://www.youtube.com/watch?v=weQmLT8zO8U&t=1417s", vk:"https://vkvideo.ru/video-226539531_456239113",
-    route:[[56.82441,60.61171],[56.8254,60.61064],[56.82527,60.60858],[56.82484,60.60856],[56.82479,60.60825],[56.8246,60.60797],[56.82448,60.60792],[56.82429,60.60795],[56.82416,60.60807],[56.82408,60.60832],[56.82404,60.60897],[56.82409,60.60912],[56.82413,60.60929],[56.82415,60.60941],[56.82422,60.60957],[56.82433,60.60965],[56.82448,60.60971],[56.8246,60.60968],[56.82466,60.60961],[56.82472,60.60939],[56.82478,60.60915],[56.82487,60.60888],[56.82489,60.60883],[56.82511,60.60866],[56.82526,60.6084],[56.8251,60.60834],[56.82503,60.60786],[56.82479,60.60723],[56.82329,60.60778],[56.81844,60.60962]] },
-  { id:11, title:"ГИККОН 2026: косплей под дождём ☔ | ВЛОГ", date:"2026-08-30", district:"Парковый", time:"День", duration:"Дождь",
-    youtube:"https://www.youtube.com/watch?v=H6GWVpRf2U0", vk:"https://vkvideo.ru/video-226539531_456239112", views:1049,
-    route:[[56.81524,60.63333],[56.81484,60.63358],[56.81469,60.6337],[56.81478,60.63455],[56.81492,60.63481],[56.81516,60.63511],[56.81528,60.6355],[56.81516,60.63578],[56.81487,60.63728],[56.81494,60.63739],[56.81494,60.63754],[56.8148,60.63756],[56.81457,60.63906],[56.81443,60.63945],[56.81348,60.63981],[56.81375,60.64072],[56.81404,60.64114],[56.81425,60.64121],[56.81454,60.64167],[56.81498,60.64205],[56.81616,60.64155],[56.81672,60.64171],[56.81708,60.64048],[56.81693,60.63918],[56.81674,60.63792],[56.81609,60.63773],[56.81603,60.63731],[56.81581,60.63753],[56.81551,60.63757],[56.81488,60.6376],[56.81461,60.63927],[56.8148,60.63956],[56.81452,60.64107],[56.81537,60.64061]] },
-  { id:12, title:"Прогулка по Екатеринбургу: Московская - Шейнкмана - Зеленая роща", date:"2026-08-28", district:"Центр", time:"День", duration:"",
-    youtube:"https://www.youtube.com/watch?v=SRqjFOgCCZk&t=1667s", vk:"https://vkvideo.ru/video-226539531_456239108", views:1170,
-    route:[[56.8146,60.58964],[56.81583,60.5891],[56.81615,60.59198],[56.81631,60.59183],[56.81635,60.59212],[56.82318,60.59006],[56.82347,60.5925],[56.82318,60.59286],[56.8231,60.59314],[56.82293,60.59304],[56.82274,60.59339],[56.82233,60.59369],[56.82184,60.59348],[56.8207,60.59417],[56.82064,60.59383],[56.82041,60.59373],[56.82029,60.59385],[56.82024,60.59437],[56.82022,60.59491],[56.82041,60.59547],[56.8208,60.5962],[56.82004,60.59696],[56.81916,60.59721],[56.81833,60.59738],[56.81843,60.59815],[56.81886,60.59941],[56.81829,60.59919],[56.81787,60.59874],[56.81752,60.59871],[56.81682,60.59879],[56.81569,60.59906]] },
-  { id:13, title:"Прогулка по Екатеринбургу: Екатерининский парк | ул. Азина | ул. Свердлова", date:"2026-08-16", district:"Центр", time:"День", duration:"",
-    youtube:"https://www.youtube.com/watch?v=pnijnxGgfPg&t=65s", vk:"https://vkvideo.ru/video-226539531_456239099", views:680,
-    route:[[56.85394,60.60873],[56.85369,60.60881],[56.85364,60.60883],[56.85358,60.6083],[56.85313,60.60843],[56.85317,60.60892],[56.85337,60.60896],[56.85339,60.6091],[56.85281,60.6093],[56.85282,60.60945],[56.85272,60.60948],[56.85164,60.6098],[56.85166,60.61001],[56.85143,60.61037],[56.8513,60.61046],[56.85118,60.61059],[56.85117,60.61039],[56.85125,60.61027],[56.85129,60.61026],[56.85133,60.61034],[56.85129,60.61047],[56.85126,60.61059],[56.85123,60.61085],[56.85121,60.61113],[56.85111,60.61124],[56.85107,60.61104],[56.85105,60.61071],[56.85104,60.61051],[56.8511,60.61056],[56.85123,60.61077],[56.85129,60.61096],[56.85134,60.61098],[56.85151,60.61093],[56.8517,60.61089],[56.8518,60.61087],[56.85197,60.61087],[56.85216,60.61088],[56.85223,60.61087],[56.85239,60.61076],[56.85254,60.61033],[56.8525,60.61021],[56.85237,60.60987],[56.85218,60.61005],[56.85202,60.61019],[56.85197,60.61039],[56.85211,60.6105],[56.85182,60.6108],[56.85173,60.61067],[56.85169,60.60994],[56.85139,60.60988],[56.85081,60.61005],[56.85043,60.61004],[56.85018,60.61013],[56.84979,60.61023],[56.84951,60.60974],[56.84961,60.60943],[56.84983,60.60932]] },
-  { id:14, title:"Прогулка по Екатеринбургу: Павлодарская | Старый мост через Исеть | ЖК Просторы", date:"2026-08-10", district:"Уктус", time:"День", duration:"",
-    youtube:"https://www.youtube.com/watch?v=-8_gV830HCg&t=55s", vk:"https://vkvideo.ru/video-226539531_456239094",
-    route:[[56.79044,60.64952],[56.79064,60.64901],[56.79075,60.64898],[56.79036,60.65083],[56.79068,60.65138],[56.79069,60.65108],[56.79084,60.65157],[56.79117,60.65202],[56.79057,60.65358],[56.79027,60.65441],[56.79112,60.65521],[56.79182,60.65473],[56.79187,60.65401],[56.79193,60.65301],[56.79125,60.6521],[56.79073,60.65145],[56.79033,60.65093],[56.79005,60.65109],[56.78996,60.65123],[56.78984,60.65173],[56.78977,60.65216],[56.78978,60.65265],[56.78975,60.65307],[56.78962,60.65335],[56.78945,60.65363],[56.78958,60.65403],[56.79072,60.65531],[56.79111,60.65574],[56.79062,60.65524],[56.78948,60.6539],[56.78886,60.65281],[56.78835,60.65142],[56.78808,60.6506],[56.78834,60.65003],[56.78838,60.64968],[56.78853,60.64953]] },
-  { id:15, title:"Прогулка: Шиловский парк г. Березовский", date:"2026-07-21", district:"Березовский", time:"День", duration:"",
-    youtube:"https://www.youtube.com/watch?v=CfO1Bq7n38g&t=2196s", vk:"https://vkvideo.ru/video-226539531_456239093", views:280,
-    route:[[56.91443,60.84534],[56.9176,60.84641],[56.91778,60.84857],[56.91832,60.84987],[56.91865,60.84999],[56.91891,60.85065],[56.91956,60.85114],[56.92014,60.8524],[56.9197,60.85323],[56.92022,60.85278],[56.92085,60.85395],[56.92099,60.85399],[56.92096,60.85419],[56.92111,60.85478],[56.9212,60.85557],[56.91957,60.85697],[56.91922,60.85749],[56.91928,60.85807],[56.91908,60.85834],[56.91891,60.85781],[56.91916,60.85703],[56.91929,60.85603],[56.91951,60.85713],[56.92154,60.85547],[56.9213,60.85488],[56.92139,60.85446],[56.92116,60.85398],[56.92128,60.85177],[56.92101,60.85076],[56.92057,60.85252],[56.92034,60.85285],[56.92034,60.85207]] },
-  { id:16, title:"Прогулка по Екатеринбургу: от ЖК Астон Сезоны до ЖК Ривер Парк (Riverpark)", date:"2026-06-11", district:"Уктус", time:"День", duration:"",
-    youtube:"https://www.youtube.com/watch?v=_PNX4umGTSs&t=410s", vk:"https://vkvideo.ru/video-226539531_456239091", views:556,
-    route:[[56.77651,60.66691],[56.77636,60.66741],[56.77549,60.66863],[56.77469,60.6697],[56.77534,60.66847],[56.77476,60.66661],[56.7736,60.66787],[56.7729,60.66909],[56.77225,60.66948],[56.77243,60.67052],[56.77135,60.67147],[56.77223,60.67042],[56.77215,60.66943],[56.77191,60.66898],[56.77082,60.66937],[56.77088,60.67032],[56.77067,60.6694],[56.76959,60.66984],[56.76875,60.67022],[56.7685,60.67081],[56.76808,60.67097],[56.76781,60.67092],[56.76663,60.67153],[56.76683,60.67312],[56.7662,60.67342],[56.76549,60.67371],[56.76536,60.67271],[56.76524,60.67265],[56.76534,60.67239],[56.76553,60.67193],[56.76655,60.67153],[56.76696,60.6758],[56.7676,60.67647],[56.76804,60.67584],[56.76814,60.67713],[56.7684,60.6772],[56.76817,60.67751],[56.76815,60.67776],[56.76845,60.67853],[56.76851,60.67898],[56.76854,60.67955],[56.76853,60.67987],[56.76845,60.67913],[56.7683,60.6792],[56.76807,60.67925],[56.7679,60.67821],[56.76769,60.67724],[56.76802,60.67709],[56.76823,60.67825],[56.76865,60.67904]] },
-  { id:17, title:"Прогулка по Екатеринбургу: Фестиваль Движение Урал | Сад у Косого дома (японский сад)", date:"2026-06-05", district:"Центр", time:"ВЛОГ", duration:"",
-    youtube:"https://www.youtube.com/watch?v=JyjBIm-EZdo&t=795s", vk:"", views:600,
-    route:[[56.83798,60.60475],[56.83785,60.60453],[56.83762,60.60418],[56.83651,60.60449],[56.83761,60.60403],[56.83764,60.60258],[56.83778,60.60232],[56.83774,60.60195],[56.83724,60.60218],[56.83698,60.60244],[56.83572,60.60308],[56.83591,60.60362],[56.83535,60.60378],[56.83544,60.60484],[56.83539,60.60376],[56.8355,60.6034],[56.83546,60.60273],[56.83551,60.60243],[56.83547,60.60199],[56.83594,60.601],[56.83597,60.6006],[56.83593,60.60019],[56.83607,60.59974],[56.83602,60.59916],[56.83595,60.59916],[56.8359,60.59863],[56.83593,60.59838],[56.83613,60.59812],[56.83601,60.59688],[56.83609,60.59674],[56.83592,60.595],[56.83674,60.59473],[56.83684,60.59544],[56.837,60.59551],[56.83706,60.596],[56.83725,60.59588],[56.83735,60.59776],[56.83745,60.59857],[56.83756,60.59859],[56.83769,60.59924],[56.83792,60.60143],[56.83816,60.60356],[56.83829,60.60512],[56.83746,60.60599],[56.83493,60.60687],[56.83344,60.60753],[56.83207,60.608],[56.83205,60.60794],[56.83195,60.60792],[56.83188,60.60784],[56.83188,60.60767],[56.83192,60.60757],[56.83193,60.60781],[56.83201,60.60784],[56.83204,60.60757],[56.83206,60.60782],[56.8317,60.60805],[56.83029,60.60854],[56.82964,60.60879],[56.82881,60.60908],[56.82802,60.60939],[56.82777,60.60947],[56.82797,60.61124],[56.82815,60.61313],[56.82821,60.61366],[56.828,60.6135]] },
-  { id:18, title:"Прогулка по Верхней Пышме: Манин Парк, комары и пение птичек | 4K Walking Vlog", date:"2026-06-04", district:"Верхняя Пышма", time:"ВЛОГ", duration:"",
-    youtube:"https://www.youtube.com/watch?v=4ykKQapHijo&t=868s", vk:"", views:265,
-    route:[[56.97721,60.59165],[56.97782,60.59244],[56.97806,60.59267],[56.97846,60.59198],[56.97923,60.59146],[56.97984,60.59157],[56.98125,60.5923],[56.98315,60.59289],[56.98383,60.59229],[56.9844,60.59147],[56.98456,60.5904],[56.98476,60.59019],[56.98488,60.59018],[56.98548,60.59146],[56.98572,60.59239],[56.98642,60.59205],[56.98641,60.59249],[56.9862,60.59256],[56.98624,60.59293],[56.98705,60.59366],[56.9872,60.5939],[56.98707,60.59466],[56.98677,60.59534],[56.98645,60.59592],[56.98636,60.59559],[56.98646,60.59543],[56.98647,60.59485],[56.9862,60.59356],[56.98572,60.59356],[56.98532,60.59395],[56.98471,60.5947],[56.98438,60.59476],[56.98266,60.59505],[56.98151,60.59465],[56.98075,60.59437],[56.98067,60.59469],[56.98051,60.59479],[56.98045,60.59474],[56.98044,60.5945],[56.98042,60.59427],[56.98034,60.59427],[56.9802,60.59492],[56.98027,60.5942],[56.98032,60.59375],[56.98023,60.5935],[56.97993,60.59399],[56.97937,60.59359],[56.97927,60.59385],[56.97927,60.59431],[56.9793,60.59457],[56.97921,60.59468],[56.97911,60.59456],[56.97922,60.59384],[56.97925,60.59353],[56.97912,60.59338],[56.97891,60.59327],[56.979,60.59277],[56.97914,60.59223]] },
-  { id:19, title:"Киношная Прогулка по Екатеринбургу в 4K | iPhone 17 Pro Cinematic videos | LOG", date:"2026-05-29", district:"Центр", time:"Киношка", duration:"",
-    youtube:"https://www.youtube.com/watch?v=3IvA-KpCn_0&t=13s", vk:"https://vkvideo.ru/video-226539531_456239088", views:550,
-    route:[[56.82275,60.61375],[56.82273,60.61322],[56.82309,60.61292],[56.82295,60.6115],[56.82329,60.61136],[56.82346,60.6113],[56.82354,60.61234],[56.82391,60.61239],[56.82418,60.61209],[56.82437,60.61221],[56.82549,60.61108],[56.82573,60.61038],[56.82563,60.60893],[56.82598,60.60888],[56.82549,60.61083],[56.82575,60.61138],[56.82605,60.61055]] },
-  { id:20, title:"Прогулка по Екатеринбургу: Микрорайон Шишимская горка, в центре Уктуса | 4K Walking Vlog", date:"2026-04-04", district:"Уктус", time:"Мрачный день", duration:"на ВК нет",
-    youtube:"https://www.youtube.com/watch?v=X-sdAqq1KDE&t=1s", vk:"", views:1500,
-    route:[[56.78558,60.64734],[56.7856,60.64718],[56.78647,60.64609],[56.78635,60.64572],[56.78538,60.64676],[56.7852,60.64685],[56.7849,60.64617],[56.78446,60.64468],[56.78453,60.64449],[56.78463,60.64382],[56.78427,60.64282],[56.78471,60.64233],[56.78535,60.64151],[56.78563,60.64344],[56.78466,60.64454],[56.78414,60.64508],[56.78366,60.64577],[56.78359,60.64595],[56.78349,60.64601],[56.78244,60.64735],[56.78275,60.64853],[56.78369,60.64717],[56.78379,60.64555],[56.78441,60.64473],[56.78475,60.64575],[56.7839,60.64686],[56.78375,60.64735],[56.78374,60.64826],[56.78387,60.64883],[56.78319,60.64965],[56.78276,60.64949],[56.78223,60.64951],[56.78134,60.65025],[56.78205,60.64963],[56.78273,60.64905],[56.78142,60.64387],[56.78198,60.64589],[56.78305,60.6501],[56.78347,60.65118],[56.78359,60.65109],[56.78394,60.65192]] },
-  { id:21, title:"Прогулка по Екатеринбургу: ул. Радищева, ул. Хохрякова | 4K Walking Vlog", date:"2026-03-28", district:"Центр - Виз - Центр", time:"Светило солнце", duration:"",
-    youtube:"https://www.youtube.com/watch?v=USCMU_yAOjg&t=707s", vk:"https://vkvideo.ru/video-226539531_456239083", views:1500,
-    route:[[56.83644,60.58151],[56.83632,60.58152],[56.83612,60.58158],[56.83585,60.58165],[56.83559,60.58009],[56.83505,60.57966],[56.8349,60.57895],[56.83427,60.57845],[56.83384,60.57855],[56.83365,60.5777],[56.83233,60.57679],[56.83282,60.5773],[56.8327,60.57821],[56.83215,60.57917],[56.83178,60.58011],[56.83196,60.58162],[56.83218,60.58328],[56.832,60.58332],[56.83204,60.58406],[56.83128,60.58447],[56.82999,60.58485],[56.82946,60.58516],[56.82964,60.5874],[56.8294,60.58745],[56.82944,60.58796],[56.83002,60.59385],[56.8264,60.59528],[56.82407,60.59611],[56.82404,60.59568],[56.82377,60.59576],[56.82229,60.59452]] },
-  { id:22, title:"Прогулка по Екатеринбургу: улица Вайнера | проспект Ленина | 4K Walking Vlog", date:"2026-03-28", district:"Без района", time:"15:10", duration:"",
-    youtube:"https://www.youtube.com/watch?v=mY5Wz1tzrN8&t=109s", vk:"https://vkvideo.ru/video-226539531_456239081", views:2000,
-    route:[[56.82803,60.59113],[56.8281,60.59176],[56.82837,60.59406],[56.82827,60.59449],[56.82862,60.59749],[56.83004,60.59701],[56.83027,60.59709],[56.83109,60.59669],[56.83219,60.59628],[56.83361,60.5957],[56.83583,60.59504],[56.83724,60.59448],[56.83691,60.59109],[56.8366,60.58795],[56.83697,60.5878],[56.83693,60.58751],[56.83708,60.58742],[56.83693,60.58738],[56.83655,60.58355],[56.83689,60.58344],[56.83694,60.58293],[56.83705,60.58284],[56.83696,60.58196],[56.83778,60.58162],[56.83854,60.58133],[56.83823,60.57892],[56.83805,60.57898],[56.83766,60.57947],[56.83744,60.57971],[56.83725,60.58089]] },
-  { id:23, title:"Прогулка по Екатеринбургу: ул. Машинная - новостройка у реки Исеть | 4K Walking Vlog", date:"2026-03-27", district:"Парковый", time:"Смеркалось", duration:"",
-    youtube:"https://www.youtube.com/watch?v=1BUQiITv_ag&t=208s", vk:"https://vkvideo.ru/video-226539531_456239080", views:678,
-    route:[[56.80774,60.62886],[56.80784,60.63032],[56.80762,60.63041],[56.80767,60.63124],[56.80756,60.63142],[56.80763,60.63249],[56.80759,60.63259],[56.80777,60.63436],[56.80793,60.63446],[56.80811,60.63614],[56.80754,60.63636],[56.80669,60.63635],[56.80616,60.63641],[56.80587,60.63647],[56.80578,60.63671],[56.8058,60.63688],[56.80609,60.63728],[56.80621,60.6373],[56.80679,60.63802],[56.80686,60.63805],[56.807,60.63767],[56.80717,60.63786],[56.80727,60.63805],[56.80746,60.63762],[56.80797,60.63834],[56.80796,60.6378],[56.80794,60.63688],[56.80809,60.63685],[56.80793,60.63671],[56.80804,60.63599],[56.80788,60.63453],[56.80772,60.63442],[56.80756,60.63266],[56.80751,60.63155],[56.80935,60.63082],[56.81056,60.63035],[56.81256,60.62969],[56.81377,60.62924],[56.81425,60.62887],[56.81507,60.62871],[56.81526,60.62903],[56.81535,60.62893],[56.81551,60.62864],[56.81603,60.62836]] },
-  { id:24, title:"Прогулка по Екатеринбургу: Весенние улицы | 4K Walking Vlog", date:"2026-03-14", district:"Центр", time:"Солнечная весна", duration:"ПОПРАВИТЬ",
-    youtube:"https://www.youtube.com/watch?v=fVwGnPHEvr8&t=825s", vk:"https://vkvideo.ru/video-226539531_456239075", views:1300,
-    route:[[56.82575,60.60837],[56.82554,60.60836],[56.82544,60.60835],[56.82534,60.60733],[56.82519,60.60603],[56.82498,60.60419],[56.82528,60.60404],[56.82591,60.60393],[56.82683,60.60361]] },
-  { id:25, title:"Прогулка по Екатеринбургу: ТЦ ЗОЛОТОЙ | улица Щербакова и Уктусская набережная | 4K Walking Vlog", date:"2026-02-15", district:"Ботаника - Уктус", time:"Смеркалось", duration:"53:25",
-    youtube:"https://www.youtube.com/watch?v=QzdzdxB8MYI", vk:"https://vkvideo.ru/video-226539531_456239073", views:2000,
-    route:[[56.79729,60.63484],[56.79732,60.63457],[56.79724,60.634],[56.79702,60.63292],[56.79689,60.63261],[56.79674,60.63252],[56.79626,60.63236],[56.7959,60.63241],[56.79562,60.63258],[56.79519,60.63323],[56.79509,60.6336],[56.79469,60.63416],[56.7946,60.63406],[56.79406,60.63491],[56.79365,60.63548],[56.79281,60.63642],[56.79227,60.63667],[56.79237,60.63872],[56.79242,60.63967],[56.79231,60.64008],[56.79223,60.64031],[56.79275,60.64171],[56.79247,60.64266],[56.79239,60.6427],[56.79254,60.64321],[56.7926,60.64395],[56.79243,60.64416],[56.79232,60.6442],[56.7917,60.64555],[56.79152,60.64563],[56.79118,60.64633],[56.79062,60.64737],[56.78994,60.64734],[56.78976,60.64708],[56.78946,60.64759],[56.78892,60.64748],[56.789,60.64855],[56.78855,60.64798],[56.78799,60.64812],[56.78751,60.64805],[56.78604,60.6497],[56.77946,60.65801],[56.77825,60.66055],[56.77719,60.66306],[56.77671,60.66375],[56.77653,60.66402],[56.77661,60.66417],[56.77687,60.66431],[56.77727,60.66434],[56.77737,60.66445],[56.77758,60.66435],[56.77784,60.66414],[56.77815,60.66385],[56.77828,60.66323],[56.77836,60.6632],[56.77828,60.6639],[56.77777,60.66454],[56.77754,60.66551],[56.77734,60.66634],[56.77717,60.66655],[56.77704,60.66664],[56.77693,60.66677],[56.77688,60.66695],[56.77653,60.66733],[56.77628,60.66773],[56.77614,60.66809],[56.7756,60.66862],[56.77511,60.66903],[56.77475,60.66945]] },
-  { id:26, title:"Прогулка по Екатеринбургу: улица Белинского и Парк им. Павлика Морозова | 4K Walking Vlog", date:"2026-01-29", district:"Центр", time:"день", duration:"",
-    youtube:"https://www.youtube.com/watch?v=fUbMxONV9Ek&t=1515s", vk:"https://vkvideo.ru/video-226539531_456239072",
-    route:[[56.81574,60.62787],[56.81567,60.62768],[56.81562,60.62715],[56.81529,60.62652],[56.81509,60.62501],[56.81529,60.62433],[56.81621,60.62401],[56.81628,60.62373],[56.81694,60.62355],[56.81694,60.62315],[56.81673,60.6208],[56.81697,60.62068],[56.82052,60.61937],[56.82056,60.61944],[56.82047,60.61948],[56.82049,60.6197],[56.82051,60.61996],[56.82049,60.62006],[56.82083,60.61984],[56.82115,60.61955],[56.82144,60.61918],[56.82158,60.61911],[56.822,60.61893],[56.82207,60.61897],[56.82215,60.6191],[56.8222,60.61914],[56.82246,60.61903],[56.82332,60.61876],[56.82339,60.61874],[56.82342,60.61869],[56.82395,60.61849],[56.82393,60.61833],[56.82404,60.61824],[56.8242,60.61822],[56.82425,60.61819],[56.82444,60.61837],[56.82453,60.61851],[56.82503,60.61841],[56.82508,60.61851],[56.82519,60.61847],[56.82534,60.6198],[56.82536,60.61981],[56.82523,60.61845],[56.82547,60.61837],[56.82557,60.61836],[56.82564,60.61871],[56.82587,60.61902],[56.82622,60.61892],[56.8263,60.61955],[56.8263,60.62018],[56.82642,60.62136],[56.82647,60.62187],[56.82601,60.622],[56.8261,60.62289],[56.8247,60.62341],[56.82496,60.62573],[56.82491,60.62584],[56.82468,60.6258],[56.82453,60.62598],[56.82397,60.62619],[56.82374,60.62628],[56.82378,60.62672],[56.82372,60.62687],[56.82373,60.62699],[56.82365,60.62704],[56.82347,60.62734],[56.82275,60.62763],[56.82261,60.62744],[56.82229,60.62702],[56.82159,60.6273],[56.82104,60.6275],[56.82034,60.62774],[56.82021,60.62814],[56.8179,60.62893],[56.81759,60.62841],[56.81759,60.62809],[56.81754,60.62813],[56.81741,60.6265],[56.8172,60.62658],[56.81713,60.62645],[56.81698,60.62623],[56.81643,60.62733],[56.81635,60.62722],[56.81603,60.62752],[56.81602,60.62741],[56.81617,60.62652],[56.81611,60.62616],[56.81631,60.62525],[56.81627,60.624],[56.81582,60.6239]] },
-  { id:27, title:"Прогулка по Екатеринбургу: улица Архангела Михаила и Фестиваль «Энергия РМК. Зима» | 4K Walking Vlog", date:"2026-01-08", district:"ВИЗ", time:"Вечер", duration:"",
-    youtube:"https://www.youtube.com/watch?v=Jr2ysJOW854&t=1539s", vk:"https://vkvideo.ru/video-226539531_456239070", views:1200,
-    route:[[56.81193,60.5144],[56.81209,60.51433],[56.81241,60.51552],[56.81278,60.51705],[56.81275,60.51724],[56.8128,60.51742],[56.81303,60.51803],[56.81322,60.51785],[56.81354,60.51893],[56.81379,60.51961],[56.81642,60.52117],[56.8166,60.52126],[56.81679,60.51925],[56.81698,60.51678],[56.81754,60.51373],[56.81776,60.5124],[56.81843,60.51129],[56.81912,60.51015],[56.81904,60.50967],[56.81884,60.50983],[56.81847,60.5101],[56.81819,60.51065],[56.818,60.5107],[56.81781,60.5104],[56.81747,60.51111],[56.81736,60.51149],[56.81736,60.51212],[56.81736,60.51303],[56.8172,60.51356],[56.81668,60.51327],[56.81657,60.51298],[56.81663,60.51245],[56.81695,60.51197],[56.81716,60.51149],[56.81752,60.51088],[56.81774,60.51038],[56.8181,60.50987],[56.81831,60.50987],[56.81827,60.51018],[56.8184,60.51031],[56.81905,60.50952],[56.81907,60.5089],[56.81931,60.50858],[56.81946,60.50884],[56.81912,60.50958],[56.81915,60.51006],[56.81778,60.51221],[56.81742,60.51346],[56.81716,60.51484],[56.81688,60.51694],[56.81672,60.51832],[56.81655,60.52118],[56.81531,60.52046]] },
-  { id:28, title:"Зимний Екатеринбург ❄️ КТТ Космос и сквер Бабыкина | 4K Walking Vlog", date:"2026-01-04", district:"Центр", time:"Вечер", duration:"ДЕНЬ ВАРЕНЬЯ!",
-    youtube:"https://www.youtube.com/watch?v=rMJQnZKoot4&t=283s", vk:"https://vkvideo.ru/video-226539531_456239069", views:1300,
-    route:[[56.84381,60.60089],[56.84402,60.60056],[56.844,60.60106],[56.84459,60.60156],[56.84508,60.60188],[56.84523,60.60236],[56.84527,60.60279],[56.84537,60.60316],[56.84524,60.60339],[56.84508,60.60428],[56.84496,60.60453],[56.84493,60.60471],[56.84497,60.60537],[56.84498,60.6056],[56.84503,60.60578],[56.84539,60.60618],[56.8457,60.60656],[56.84574,60.60652],[56.84598,60.60684],[56.84638,60.60626],[56.8468,60.60564],[56.84701,60.60265],[56.84769,60.60106],[56.85086,60.59392],[56.85107,60.59425],[56.85138,60.59358],[56.85119,60.59335],[56.85135,60.593],[56.85143,60.59313],[56.85144,60.59283],[56.85109,60.59251],[56.85092,60.59227],[56.85097,60.59215],[56.85092,60.59193],[56.85079,60.59182],[56.85061,60.59155],[56.85056,60.59139],[56.85064,60.59126],[56.8507,60.59112],[56.85081,60.59136],[56.85092,60.59136],[56.8511,60.59112],[56.85129,60.59069],[56.85134,60.59047],[56.85144,60.59068],[56.85132,60.59094]] },
-  { id:29, title:"Зимний центр Екатеринбурга: большая прогулка, Ледовый Городок, Вайнера 2.01.2026 | 4K Walking Vlog", date:"2026-01-02", district:"Центр", time:"Вечер", duration:"",
-    youtube:"https://www.youtube.com/watch?v=nevELBzZylU", vk:"https://vkvideo.ru/video-226539531_456239067", views:2500,
-    route:[[56.83848,60.60437],[56.8382,60.60448],[56.83805,60.60452],[56.83773,60.60399],[56.83773,60.60376],[56.8377,60.60344],[56.83762,60.60261],[56.83779,60.60233],[56.83775,60.60163],[56.83791,60.60157],[56.83766,60.59898],[56.83807,60.59883],[56.83804,60.5985],[56.83793,60.59843],[56.83777,60.59657],[56.83788,60.59654],[56.83797,60.5964],[56.83821,60.59631],[56.83826,60.5963],[56.83832,60.59679],[56.83823,60.59603],[56.83788,60.59583],[56.83769,60.59577],[56.83763,60.59509],[56.83758,60.59478],[56.83715,60.59497],[56.83719,60.59539],[56.83678,60.59558],[56.83675,60.59583],[56.83641,60.59615],[56.83678,60.59535],[56.83671,60.59482],[56.83595,60.5951],[56.83451,60.59564],[56.83415,60.59578],[56.83416,60.59593],[56.83411,60.59581],[56.83383,60.59591],[56.83397,60.59754],[56.8342,60.59955],[56.83426,60.59972],[56.83568,60.59923],[56.8359,60.59922],[56.83586,60.59862],[56.83609,60.5981],[56.836,60.59703],[56.83632,60.59687],[56.83723,60.59652],[56.83734,60.59754],[56.83722,60.59761],[56.83736,60.59779],[56.83746,60.59866],[56.83768,60.5988],[56.83877,60.59839],[56.83879,60.59857],[56.83988,60.59818],[56.84124,60.59769],[56.8411,60.59799],[56.84126,60.59943],[56.8413,60.59999],[56.84056,60.60045],[56.84139,60.6001],[56.84131,60.59926],[56.84122,60.5979],[56.84154,60.59718],[56.84568,60.58695],[56.85445,60.59893],[56.85607,60.60151],[56.8563,60.60378],[56.85007,60.60571],[56.84881,60.60763],[56.84804,60.60869],[56.84524,60.60944],[56.83943,60.61129],[56.83595,60.61237],[56.83569,60.61215],[56.83555,60.61193],[56.83532,60.61185],[56.8344,60.61218],[56.83079,60.61344],[56.82847,60.6142],[56.82765,60.61334],[56.82579,60.6139],[56.82392,60.61449],[56.82369,60.61458],[56.82331,60.61126],[56.81864,60.61302]] },
-  { id:30, title:"Зимний вечер в Екатеринбурге ❄️ | 27.12.2025. Площадь обороны", date:"2025-12-27", district:"Центр", time:"Вечер", duration:"Снег",
-    youtube:"https://www.youtube.com/watch?v=_3eZCHf8sEA", vk:"https://vkvideo.ru/video-226539531_456239066", views:412,
-    route:[[56.82332,60.62968],[56.82327,60.62947],[56.82331,60.63003],[56.8238,60.62882],[56.82374,60.62862],[56.82342,60.62872],[56.82319,60.62841],[56.82352,60.62748],[56.82347,60.62736],[56.8229,60.62759],[56.82273,60.62764],[56.82265,60.62787],[56.82314,60.62833],[56.82266,60.62781],[56.82261,60.62746],[56.8224,60.62736],[56.82231,60.62739],[56.82216,60.62594]] },
-  { id:31, title:"Новогодний базар в ТЦ «Дирижабль» + вечерняя поездка | Екатеринбург | 4K", date:"2025-12-21", district:"Ботаника - ВИЗ", time:"Вечер", duration:"",
-    youtube:"https://www.youtube.com/watch?v=8noCffGXYPw&t=364s", vk:"https://vkvideo.ru/video-226539531_456239065",
-    route:[[56.79793,60.62728],[56.79776,60.62714],[56.79758,60.6264],[56.79739,60.62661],[56.79705,60.62695],[56.7968,60.62739],[56.79664,60.62705],[56.79661,60.62656],[56.79701,60.62631],[56.79735,60.62626],[56.79781,60.62657],[56.79798,60.62649],[56.79764,60.62395],[56.79769,60.61114],[56.79987,60.61183],[56.80013,60.6129],[56.8056,60.61093],[56.80537,60.60833],[56.80824,60.60728],[56.80672,60.59144],[56.82113,60.55295],[56.82093,60.55307],[56.82075,60.5534],[56.82006,60.55209],[56.81849,60.54738],[56.81692,60.54907],[56.81666,60.54972],[56.81607,60.54906]] },
-  { id:32, title:"Прогулка по центру Екатеринбурга в декабре | 4K Walking Vlog", date:"2025-12-13", district:"Центр", time:"Вечер", duration:"Снег",
-    youtube:"https://www.youtube.com/watch?v=KoaDS5g8Eb8&t=1142s", vk:"https://vkvideo.ru/video-226539531_456239064", views:2600,
-    route:[[56.83523,60.61376],[56.83516,60.61283],[56.8352,60.6117],[56.83523,60.61162],[56.835,60.60948],[56.83476,60.60955],[56.83482,60.61012],[56.83472,60.60957],[56.83448,60.60964],[56.83392,60.60984],[56.83388,60.60966],[56.83315,60.60987],[56.83284,60.60999],[56.83277,60.60955],[56.83294,60.6095],[56.83276,60.60951],[56.83275,60.60929],[56.83284,60.60938],[56.83278,60.6092],[56.83274,60.60916],[56.83257,60.60788],[56.83205,60.60808],[56.83185,60.60802],[56.83156,60.60805],[56.83131,60.60812],[56.83093,60.60827],[56.82884,60.60898],[56.82875,60.60897],[56.82857,60.60721],[56.82816,60.60732],[56.82811,60.60697],[56.82833,60.60627],[56.82832,60.60613],[56.82824,60.60608],[56.82827,60.60586],[56.82783,60.6058],[56.82771,60.60584],[56.82772,60.60615],[56.82759,60.60621],[56.8273,60.6036],[56.82706,60.60376],[56.82718,60.60466],[56.827,60.60492],[56.82704,60.60542],[56.82659,60.60593],[56.82647,60.60637],[56.82637,60.60645],[56.82629,60.60676],[56.82532,60.60701],[56.82521,60.60707],[56.82527,60.60768],[56.82533,60.60835],[56.82551,60.60843],[56.82558,60.60857],[56.82561,60.60885],[56.8256,60.60904],[56.82567,60.60914],[56.8257,60.60929],[56.82558,60.60946],[56.82563,60.60993],[56.82556,60.61044],[56.82494,60.61116]] },
-  { id:33, title:"ВНЕЗАПНЫЙ СНЕГОПАД В КОНЦЕ НОЯБРЯ - vlog walk 4K", date:"2026-11-05", district:"Южный Автовокзал", time:"Вечер", duration:"22:00",
-    youtube:"https://www.youtube.com/watch?v=ofv_Ql9PRws&t=11s", vk:"https://vkvideo.ru/video-226539531_456239061",
-    route:[[56.81172,60.62203],[56.81014,60.62256],[56.81,60.62264],[56.80927,60.61583],[56.80863,60.61015],[56.81327,60.60847],[56.81324,60.60818],[56.81441,60.60771],[56.81447,60.60756],[56.8146,60.60759],[56.8147,60.60765],[56.81554,60.60733],[56.8156,60.60786],[56.81579,60.61027],[56.81606,60.61379],[56.81396,60.61467],[56.81441,60.61994],[56.81398,60.6201],[56.81405,60.62069],[56.81361,60.62084],[56.8136,60.62097]] },
-  { id:34, title:"Зимний вечер в Екатеринбурге ❄️ люди, огни и жизнь большого района", date:"2025-01-02", district:"Академический", time:"Вечер", duration:"Горки!",
-    youtube:"https://www.youtube.com/watch?v=ERUKF4_BLKg&t=23s", vk:"https://vkvideo.ru/video-226539531_456239048",
-    route:[[56.77862,60.52257],[56.7789,60.52224],[56.77948,60.52176],[56.77979,60.52109],[56.78078,60.5194],[56.78116,60.51856],[56.78159,60.51848],[56.78161,60.51946],[56.78202,60.51912],[56.78221,60.51834],[56.78204,60.51685],[56.78184,60.5166],[56.78173,60.51607],[56.78211,60.5154],[56.78248,60.51548],[56.78292,60.5149],[56.78372,60.51413],[56.78377,60.51366],[56.78278,60.51238],[56.78258,60.5123],[56.7825,60.51155],[56.7843,60.51052],[56.78533,60.50909],[56.78562,60.50863],[56.78673,60.50685],[56.78765,60.50512],[56.78748,60.5048],[56.78734,60.50441],[56.78746,60.50398],[56.78765,60.50433],[56.78784,60.50403],[56.78724,60.50427],[56.78737,60.50551],[56.78702,60.50605],[56.78686,60.50596],[56.78686,60.50638],[56.78624,60.50768],[56.78565,60.50876],[56.78578,60.50901],[56.78558,60.50992],[56.78559,60.51008],[56.7853,60.51176],[56.78515,60.51164],[56.78575,60.5127],[56.78683,60.51084],[56.78713,60.5114],[56.78709,60.51155],[56.78723,60.51155],[56.78644,60.51312],[56.78603,60.51331],[56.78575,60.51282],[56.78575,60.51282],[56.78462,60.51467],[56.78231,60.51884],[56.78122,60.51733]] }
+  { id:6, title:"Прогулка по Екатеринбургу: от Ленина до Восточной. Шарташский рынок | 24 октября | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=lxo1IqUWjqQ&t=1532s", vk:"https://vkvideo.ru/video-226539531_456239119",
+    segments:[
+      { kind:"walk", date:"2026-10-29", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"день",
+        route:[[56.83847,60.62402],[56.83915,60.62377],[56.83919,60.62422],[56.83935,60.62491],[56.83972,60.62491],[56.83967,60.62414],[56.83986,60.62404],[56.84005,60.62537],[56.84068,60.62577],[56.84102,60.6288],[56.84057,60.62921],[56.8411,60.62952],[56.84143,60.63203],[56.83816,60.63328],[56.83553,60.63425],[56.83368,60.63487],[56.8308,60.63593],[56.83058,60.63654],[56.83016,60.63699],[56.83039,60.63866],[56.82992,60.6389],[56.82965,60.63724],[56.82901,60.63681],[56.82655,60.63781]] }
+    ] },
+  { id:7, title:"Прогулка по Екатеринбургу: от ул. Луначарского до Сада им. Энгельса", youtube:"https://www.youtube.com/watch?v=x03Uom1dEKE", vk:"https://vkvideo.ru/video-226539531_456239118", views:0,
+    segments:[
+      { kind:"walk", date:"2026-10-24", start:"", end:"", city:"Екатеринбург", districts:[], note:"День",
+        route:[[56.82742,60.62639],[56.82733,60.62532],[56.82834,60.62493],[56.82834,60.62493],[56.83138,60.62386],[56.83625,60.62202],[56.8369,60.62743],[56.8366,60.6272],[56.83558,60.62765],[56.83625,60.62602],[56.83642,60.62643]] }
+    ] },
+  { id:8, title:"Прогулка по Екатеринбургу: от улицы Архангела Михаила до Шаумяна через ТЦ МЕГА", youtube:"https://www.youtube.com/watch?v=-kqbVbsluDQ&t=37s", vk:"https://vkvideo.ru/video-226539531_456239116",
+    segments:[
+      { kind:"walk", date:"2026-10-20", start:"", end:"", city:"Екатеринбург", districts:["ВИЗ"], note:"день",
+        route:[[56.81808,60.51054],[56.81819,60.51001],[56.81924,60.50997],[56.82034,60.50791],[56.82138,60.50907],[56.82277,60.50903],[56.82323,60.50899],[56.82334,60.50694],[56.82482,60.50686],[56.82529,60.50652],[56.82509,60.50618],[56.8252,60.50545],[56.82488,60.5045],[56.82491,60.50337],[56.82496,60.50038],[56.82581,60.50149],[56.82614,60.51255],[56.82711,60.52979],[56.82765,60.53048],[56.82733,60.53632],[56.82749,60.53637],[56.82715,60.54151],[56.82696,60.5415],[56.8268,60.54369],[56.82467,60.54319],[56.82366,60.54589],[56.82349,60.54763],[56.82132,60.55262],[56.81944,60.55738],[56.81721,60.56344],[56.81585,60.56718]] }
+    ] },
+  { id:9, title:"Прогулка по Екатеринбургу: ул.Малышева | Шарташские Каменные Палатки", youtube:"https://www.youtube.com/watch?v=lEkbFP5gGtk&t=516s", vk:"",
+    segments:[
+      { kind:"walk", date:"2026-10-14", start:"", end:"", city:"Екатеринбург", districts:["Втузгородок"], note:"День",
+        route:[[56.84358,60.65208],[56.84294,60.65117],[56.84037,60.65193],[56.84023,60.65199],[56.84016,60.65177],[56.83897,60.65222],[56.83867,60.6496],[56.83884,60.65188],[56.83767,60.65232],[56.83771,60.65267],[56.83239,60.65456],[56.83234,60.65483],[56.83345,60.65468],[56.83349,60.65516],[56.83333,60.65579],[56.83303,60.65583],[56.83295,60.65581],[56.83263,60.65595],[56.83246,60.65619],[56.83247,60.6565],[56.83257,60.65683],[56.83251,60.65709],[56.83184,60.65712],[56.83276,60.65722],[56.83297,60.65641],[56.83329,60.65632],[56.83336,60.6558],[56.83357,60.65573],[56.83368,60.65677],[56.83378,60.6576],[56.83331,60.65787],[56.83345,60.65926],[56.83352,60.65981],[56.83382,60.65992],[56.83416,60.65979],[56.83435,60.65992]] }
+    ] },
+  { id:10, title:"Прогулка по Екатеринбургу: УГМК-Арена - Маркет Маркета - ул.Степана Разина", youtube:"https://www.youtube.com/watch?v=weQmLT8zO8U&t=1417s", vk:"https://vkvideo.ru/video-226539531_456239113",
+    segments:[
+      { kind:"walk", date:"2026-09-02", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"День",
+        route:[[56.82441,60.61171],[56.8254,60.61064],[56.82527,60.60858],[56.82484,60.60856],[56.82479,60.60825],[56.8246,60.60797],[56.82448,60.60792],[56.82429,60.60795],[56.82416,60.60807],[56.82408,60.60832],[56.82404,60.60897],[56.82409,60.60912],[56.82413,60.60929],[56.82415,60.60941],[56.82422,60.60957],[56.82433,60.60965],[56.82448,60.60971],[56.8246,60.60968],[56.82466,60.60961],[56.82472,60.60939],[56.82478,60.60915],[56.82487,60.60888],[56.82489,60.60883],[56.82511,60.60866],[56.82526,60.6084],[56.8251,60.60834],[56.82503,60.60786],[56.82479,60.60723],[56.82329,60.60778],[56.81844,60.60962]] }
+    ] },
+  { id:11, title:"ГИККОН 2026: косплей под дождём ☔ | ВЛОГ", youtube:"https://www.youtube.com/watch?v=H6GWVpRf2U0", vk:"https://vkvideo.ru/video-226539531_456239112", views:1049,
+    segments:[
+      { kind:"walk", date:"2026-08-30", start:"", end:"", city:"Екатеринбург", districts:["Парковый"], note:"День · Дождь",
+        route:[[56.81524,60.63333],[56.81484,60.63358],[56.81469,60.6337],[56.81478,60.63455],[56.81492,60.63481],[56.81516,60.63511],[56.81528,60.6355],[56.81516,60.63578],[56.81487,60.63728],[56.81494,60.63739],[56.81494,60.63754],[56.8148,60.63756],[56.81457,60.63906],[56.81443,60.63945],[56.81348,60.63981],[56.81375,60.64072],[56.81404,60.64114],[56.81425,60.64121],[56.81454,60.64167],[56.81498,60.64205],[56.81616,60.64155],[56.81672,60.64171],[56.81708,60.64048],[56.81693,60.63918],[56.81674,60.63792],[56.81609,60.63773],[56.81603,60.63731],[56.81581,60.63753],[56.81551,60.63757],[56.81488,60.6376],[56.81461,60.63927],[56.8148,60.63956],[56.81452,60.64107],[56.81537,60.64061]] }
+    ] },
+  { id:12, title:"Прогулка по Екатеринбургу: Московская - Шейнкмана - Зеленая роща", youtube:"https://www.youtube.com/watch?v=SRqjFOgCCZk&t=1667s", vk:"https://vkvideo.ru/video-226539531_456239108", views:1170,
+    segments:[
+      { kind:"walk", date:"2026-08-28", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"День",
+        route:[[56.8146,60.58964],[56.81583,60.5891],[56.81615,60.59198],[56.81631,60.59183],[56.81635,60.59212],[56.82318,60.59006],[56.82347,60.5925],[56.82318,60.59286],[56.8231,60.59314],[56.82293,60.59304],[56.82274,60.59339],[56.82233,60.59369],[56.82184,60.59348],[56.8207,60.59417],[56.82064,60.59383],[56.82041,60.59373],[56.82029,60.59385],[56.82024,60.59437],[56.82022,60.59491],[56.82041,60.59547],[56.8208,60.5962],[56.82004,60.59696],[56.81916,60.59721],[56.81833,60.59738],[56.81843,60.59815],[56.81886,60.59941],[56.81829,60.59919],[56.81787,60.59874],[56.81752,60.59871],[56.81682,60.59879],[56.81569,60.59906]] }
+    ] },
+  { id:13, title:"Прогулка по Екатеринбургу: Екатерининский парк | ул. Азина | ул. Свердлова", youtube:"https://www.youtube.com/watch?v=pnijnxGgfPg&t=65s", vk:"https://vkvideo.ru/video-226539531_456239099", views:680,
+    segments:[
+      { kind:"walk", date:"2026-08-16", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"День",
+        route:[[56.85394,60.60873],[56.85369,60.60881],[56.85364,60.60883],[56.85358,60.6083],[56.85313,60.60843],[56.85317,60.60892],[56.85337,60.60896],[56.85339,60.6091],[56.85281,60.6093],[56.85282,60.60945],[56.85272,60.60948],[56.85164,60.6098],[56.85166,60.61001],[56.85143,60.61037],[56.8513,60.61046],[56.85118,60.61059],[56.85117,60.61039],[56.85125,60.61027],[56.85129,60.61026],[56.85133,60.61034],[56.85129,60.61047],[56.85126,60.61059],[56.85123,60.61085],[56.85121,60.61113],[56.85111,60.61124],[56.85107,60.61104],[56.85105,60.61071],[56.85104,60.61051],[56.8511,60.61056],[56.85123,60.61077],[56.85129,60.61096],[56.85134,60.61098],[56.85151,60.61093],[56.8517,60.61089],[56.8518,60.61087],[56.85197,60.61087],[56.85216,60.61088],[56.85223,60.61087],[56.85239,60.61076],[56.85254,60.61033],[56.8525,60.61021],[56.85237,60.60987],[56.85218,60.61005],[56.85202,60.61019],[56.85197,60.61039],[56.85211,60.6105],[56.85182,60.6108],[56.85173,60.61067],[56.85169,60.60994],[56.85139,60.60988],[56.85081,60.61005],[56.85043,60.61004],[56.85018,60.61013],[56.84979,60.61023],[56.84951,60.60974],[56.84961,60.60943],[56.84983,60.60932]] }
+    ] },
+  { id:14, title:"Прогулка по Екатеринбургу: Павлодарская | Старый мост через Исеть | ЖК Просторы", youtube:"https://www.youtube.com/watch?v=-8_gV830HCg&t=55s", vk:"https://vkvideo.ru/video-226539531_456239094",
+    segments:[
+      { kind:"walk", date:"2026-08-10", start:"", end:"", city:"Екатеринбург", districts:["Уктус"], note:"День",
+        route:[[56.79044,60.64952],[56.79064,60.64901],[56.79075,60.64898],[56.79036,60.65083],[56.79068,60.65138],[56.79069,60.65108],[56.79084,60.65157],[56.79117,60.65202],[56.79057,60.65358],[56.79027,60.65441],[56.79112,60.65521],[56.79182,60.65473],[56.79187,60.65401],[56.79193,60.65301],[56.79125,60.6521],[56.79073,60.65145],[56.79033,60.65093],[56.79005,60.65109],[56.78996,60.65123],[56.78984,60.65173],[56.78977,60.65216],[56.78978,60.65265],[56.78975,60.65307],[56.78962,60.65335],[56.78945,60.65363],[56.78958,60.65403],[56.79072,60.65531],[56.79111,60.65574],[56.79062,60.65524],[56.78948,60.6539],[56.78886,60.65281],[56.78835,60.65142],[56.78808,60.6506],[56.78834,60.65003],[56.78838,60.64968],[56.78853,60.64953]] }
+    ] },
+  { id:15, title:"Прогулка: Шиловский парк г. Березовский", youtube:"https://www.youtube.com/watch?v=CfO1Bq7n38g&t=2196s", vk:"https://vkvideo.ru/video-226539531_456239093", views:280,
+    segments:[
+      { kind:"walk", date:"2026-07-21", start:"", end:"", city:"Березовский", districts:[], note:"День",
+        route:[[56.91443,60.84534],[56.9176,60.84641],[56.91778,60.84857],[56.91832,60.84987],[56.91865,60.84999],[56.91891,60.85065],[56.91956,60.85114],[56.92014,60.8524],[56.9197,60.85323],[56.92022,60.85278],[56.92085,60.85395],[56.92099,60.85399],[56.92096,60.85419],[56.92111,60.85478],[56.9212,60.85557],[56.91957,60.85697],[56.91922,60.85749],[56.91928,60.85807],[56.91908,60.85834],[56.91891,60.85781],[56.91916,60.85703],[56.91929,60.85603],[56.91951,60.85713],[56.92154,60.85547],[56.9213,60.85488],[56.92139,60.85446],[56.92116,60.85398],[56.92128,60.85177],[56.92101,60.85076],[56.92057,60.85252],[56.92034,60.85285],[56.92034,60.85207]] }
+    ] },
+  { id:16, title:"Прогулка по Екатеринбургу: от ЖК Астон Сезоны до ЖК Ривер Парк (Riverpark)", youtube:"https://www.youtube.com/watch?v=_PNX4umGTSs&t=410s", vk:"https://vkvideo.ru/video-226539531_456239091", views:556,
+    segments:[
+      { kind:"walk", date:"2026-06-11", start:"", end:"", city:"Екатеринбург", districts:["Уктус"], note:"День",
+        route:[[56.77651,60.66691],[56.77636,60.66741],[56.77549,60.66863],[56.77469,60.6697],[56.77534,60.66847],[56.77476,60.66661],[56.7736,60.66787],[56.7729,60.66909],[56.77225,60.66948],[56.77243,60.67052],[56.77135,60.67147],[56.77223,60.67042],[56.77215,60.66943],[56.77191,60.66898],[56.77082,60.66937],[56.77088,60.67032],[56.77067,60.6694],[56.76959,60.66984],[56.76875,60.67022],[56.7685,60.67081],[56.76808,60.67097],[56.76781,60.67092],[56.76663,60.67153],[56.76683,60.67312],[56.7662,60.67342],[56.76549,60.67371],[56.76536,60.67271],[56.76524,60.67265],[56.76534,60.67239],[56.76553,60.67193],[56.76655,60.67153],[56.76696,60.6758],[56.7676,60.67647],[56.76804,60.67584],[56.76814,60.67713],[56.7684,60.6772],[56.76817,60.67751],[56.76815,60.67776],[56.76845,60.67853],[56.76851,60.67898],[56.76854,60.67955],[56.76853,60.67987],[56.76845,60.67913],[56.7683,60.6792],[56.76807,60.67925],[56.7679,60.67821],[56.76769,60.67724],[56.76802,60.67709],[56.76823,60.67825],[56.76865,60.67904]] }
+    ] },
+  { id:17, title:"Прогулка по Екатеринбургу: Фестиваль Движение Урал | Сад у Косого дома (японский сад)", youtube:"https://www.youtube.com/watch?v=JyjBIm-EZdo&t=795s", vk:"", views:600,
+    segments:[
+      { kind:"vlog", date:"2026-06-05", start:"", end:"", city:"Екатеринбург", districts:["Центр"],
+        route:[[56.83798,60.60475],[56.83785,60.60453],[56.83762,60.60418],[56.83651,60.60449],[56.83761,60.60403],[56.83764,60.60258],[56.83778,60.60232],[56.83774,60.60195],[56.83724,60.60218],[56.83698,60.60244],[56.83572,60.60308],[56.83591,60.60362],[56.83535,60.60378],[56.83544,60.60484],[56.83539,60.60376],[56.8355,60.6034],[56.83546,60.60273],[56.83551,60.60243],[56.83547,60.60199],[56.83594,60.601],[56.83597,60.6006],[56.83593,60.60019],[56.83607,60.59974],[56.83602,60.59916],[56.83595,60.59916],[56.8359,60.59863],[56.83593,60.59838],[56.83613,60.59812],[56.83601,60.59688],[56.83609,60.59674],[56.83592,60.595],[56.83674,60.59473],[56.83684,60.59544],[56.837,60.59551],[56.83706,60.596],[56.83725,60.59588],[56.83735,60.59776],[56.83745,60.59857],[56.83756,60.59859],[56.83769,60.59924],[56.83792,60.60143],[56.83816,60.60356],[56.83829,60.60512],[56.83746,60.60599],[56.83493,60.60687],[56.83344,60.60753],[56.83207,60.608],[56.83205,60.60794],[56.83195,60.60792],[56.83188,60.60784],[56.83188,60.60767],[56.83192,60.60757],[56.83193,60.60781],[56.83201,60.60784],[56.83204,60.60757],[56.83206,60.60782],[56.8317,60.60805],[56.83029,60.60854],[56.82964,60.60879],[56.82881,60.60908],[56.82802,60.60939],[56.82777,60.60947],[56.82797,60.61124],[56.82815,60.61313],[56.82821,60.61366],[56.828,60.6135]] }
+    ] },
+  { id:18, title:"Прогулка по Верхней Пышме: Манин Парк, комары и пение птичек | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=4ykKQapHijo&t=868s", vk:"", views:265,
+    segments:[
+      { kind:"vlog", date:"2026-06-04", start:"", end:"", city:"Верхняя Пышма", districts:[],
+        route:[[56.97721,60.59165],[56.97782,60.59244],[56.97806,60.59267],[56.97846,60.59198],[56.97923,60.59146],[56.97984,60.59157],[56.98125,60.5923],[56.98315,60.59289],[56.98383,60.59229],[56.9844,60.59147],[56.98456,60.5904],[56.98476,60.59019],[56.98488,60.59018],[56.98548,60.59146],[56.98572,60.59239],[56.98642,60.59205],[56.98641,60.59249],[56.9862,60.59256],[56.98624,60.59293],[56.98705,60.59366],[56.9872,60.5939],[56.98707,60.59466],[56.98677,60.59534],[56.98645,60.59592],[56.98636,60.59559],[56.98646,60.59543],[56.98647,60.59485],[56.9862,60.59356],[56.98572,60.59356],[56.98532,60.59395],[56.98471,60.5947],[56.98438,60.59476],[56.98266,60.59505],[56.98151,60.59465],[56.98075,60.59437],[56.98067,60.59469],[56.98051,60.59479],[56.98045,60.59474],[56.98044,60.5945],[56.98042,60.59427],[56.98034,60.59427],[56.9802,60.59492],[56.98027,60.5942],[56.98032,60.59375],[56.98023,60.5935],[56.97993,60.59399],[56.97937,60.59359],[56.97927,60.59385],[56.97927,60.59431],[56.9793,60.59457],[56.97921,60.59468],[56.97911,60.59456],[56.97922,60.59384],[56.97925,60.59353],[56.97912,60.59338],[56.97891,60.59327],[56.979,60.59277],[56.97914,60.59223]] }
+    ] },
+  { id:19, title:"Киношная Прогулка по Екатеринбургу в 4K | iPhone 17 Pro Cinematic videos | LOG", youtube:"https://www.youtube.com/watch?v=3IvA-KpCn_0&t=13s", vk:"https://vkvideo.ru/video-226539531_456239088", views:550,
+    segments:[
+      { kind:"walk", date:"2026-05-29", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"Киношка",
+        route:[[56.82275,60.61375],[56.82273,60.61322],[56.82309,60.61292],[56.82295,60.6115],[56.82329,60.61136],[56.82346,60.6113],[56.82354,60.61234],[56.82391,60.61239],[56.82418,60.61209],[56.82437,60.61221],[56.82549,60.61108],[56.82573,60.61038],[56.82563,60.60893],[56.82598,60.60888],[56.82549,60.61083],[56.82575,60.61138],[56.82605,60.61055]] }
+    ] },
+  { id:20, title:"Прогулка по Екатеринбургу: Микрорайон Шишимская горка, в центре Уктуса | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=X-sdAqq1KDE&t=1s", vk:"", views:1500,
+    segments:[
+      { kind:"walk", date:"2026-04-04", start:"", end:"", city:"Екатеринбург", districts:["Уктус"], note:"Мрачный день", adminNote:"на ВК нет",
+        route:[[56.78558,60.64734],[56.7856,60.64718],[56.78647,60.64609],[56.78635,60.64572],[56.78538,60.64676],[56.7852,60.64685],[56.7849,60.64617],[56.78446,60.64468],[56.78453,60.64449],[56.78463,60.64382],[56.78427,60.64282],[56.78471,60.64233],[56.78535,60.64151],[56.78563,60.64344],[56.78466,60.64454],[56.78414,60.64508],[56.78366,60.64577],[56.78359,60.64595],[56.78349,60.64601],[56.78244,60.64735],[56.78275,60.64853],[56.78369,60.64717],[56.78379,60.64555],[56.78441,60.64473],[56.78475,60.64575],[56.7839,60.64686],[56.78375,60.64735],[56.78374,60.64826],[56.78387,60.64883],[56.78319,60.64965],[56.78276,60.64949],[56.78223,60.64951],[56.78134,60.65025],[56.78205,60.64963],[56.78273,60.64905],[56.78142,60.64387],[56.78198,60.64589],[56.78305,60.6501],[56.78347,60.65118],[56.78359,60.65109],[56.78394,60.65192]] }
+    ] },
+  { id:21, title:"Прогулка по Екатеринбургу: ул. Радищева, ул. Хохрякова | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=USCMU_yAOjg&t=707s", vk:"https://vkvideo.ru/video-226539531_456239083", views:1500,
+    segments:[
+      { kind:"walk", date:"2026-03-28", start:"", end:"", city:"Екатеринбург", districts:["Центр","ВИЗ","Центр"], note:"Светило солнце",
+        route:[[56.83644,60.58151],[56.83632,60.58152],[56.83612,60.58158],[56.83585,60.58165],[56.83559,60.58009],[56.83505,60.57966],[56.8349,60.57895],[56.83427,60.57845],[56.83384,60.57855],[56.83365,60.5777],[56.83233,60.57679],[56.83282,60.5773],[56.8327,60.57821],[56.83215,60.57917],[56.83178,60.58011],[56.83196,60.58162],[56.83218,60.58328],[56.832,60.58332],[56.83204,60.58406],[56.83128,60.58447],[56.82999,60.58485],[56.82946,60.58516],[56.82964,60.5874],[56.8294,60.58745],[56.82944,60.58796],[56.83002,60.59385],[56.8264,60.59528],[56.82407,60.59611],[56.82404,60.59568],[56.82377,60.59576],[56.82229,60.59452]] }
+    ] },
+  { id:22, title:"Прогулка по Екатеринбургу: улица Вайнера | проспект Ленина | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=mY5Wz1tzrN8&t=109s", vk:"https://vkvideo.ru/video-226539531_456239081", views:2000,
+    segments:[
+      { kind:"walk", date:"2026-03-28", start:"15:10", end:"", city:"Екатеринбург", districts:[],
+        route:[[56.82803,60.59113],[56.8281,60.59176],[56.82837,60.59406],[56.82827,60.59449],[56.82862,60.59749],[56.83004,60.59701],[56.83027,60.59709],[56.83109,60.59669],[56.83219,60.59628],[56.83361,60.5957],[56.83583,60.59504],[56.83724,60.59448],[56.83691,60.59109],[56.8366,60.58795],[56.83697,60.5878],[56.83693,60.58751],[56.83708,60.58742],[56.83693,60.58738],[56.83655,60.58355],[56.83689,60.58344],[56.83694,60.58293],[56.83705,60.58284],[56.83696,60.58196],[56.83778,60.58162],[56.83854,60.58133],[56.83823,60.57892],[56.83805,60.57898],[56.83766,60.57947],[56.83744,60.57971],[56.83725,60.58089]] }
+    ] },
+  { id:23, title:"Прогулка по Екатеринбургу: ул. Машинная - новостройка у реки Исеть | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=1BUQiITv_ag&t=208s", vk:"https://vkvideo.ru/video-226539531_456239080", views:678,
+    segments:[
+      { kind:"walk", date:"2026-03-27", start:"", end:"", city:"Екатеринбург", districts:["Парковый"], note:"Смеркалось",
+        route:[[56.80774,60.62886],[56.80784,60.63032],[56.80762,60.63041],[56.80767,60.63124],[56.80756,60.63142],[56.80763,60.63249],[56.80759,60.63259],[56.80777,60.63436],[56.80793,60.63446],[56.80811,60.63614],[56.80754,60.63636],[56.80669,60.63635],[56.80616,60.63641],[56.80587,60.63647],[56.80578,60.63671],[56.8058,60.63688],[56.80609,60.63728],[56.80621,60.6373],[56.80679,60.63802],[56.80686,60.63805],[56.807,60.63767],[56.80717,60.63786],[56.80727,60.63805],[56.80746,60.63762],[56.80797,60.63834],[56.80796,60.6378],[56.80794,60.63688],[56.80809,60.63685],[56.80793,60.63671],[56.80804,60.63599],[56.80788,60.63453],[56.80772,60.63442],[56.80756,60.63266],[56.80751,60.63155],[56.80935,60.63082],[56.81056,60.63035],[56.81256,60.62969],[56.81377,60.62924],[56.81425,60.62887],[56.81507,60.62871],[56.81526,60.62903],[56.81535,60.62893],[56.81551,60.62864],[56.81603,60.62836]] }
+    ] },
+  { id:24, title:"Прогулка по Екатеринбургу: Весенние улицы | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=fVwGnPHEvr8&t=825s", vk:"https://vkvideo.ru/video-226539531_456239075", views:1300,
+    segments:[
+      { kind:"walk", date:"2026-03-14", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"Солнечная весна", adminNote:"ПОПРАВИТЬ",
+        route:[[56.82575,60.60837],[56.82554,60.60836],[56.82544,60.60835],[56.82534,60.60733],[56.82519,60.60603],[56.82498,60.60419],[56.82528,60.60404],[56.82591,60.60393],[56.82683,60.60361]] }
+    ] },
+  { id:25, title:"Прогулка по Екатеринбургу: ТЦ ЗОЛОТОЙ | улица Щербакова и Уктусская набережная | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=QzdzdxB8MYI", vk:"https://vkvideo.ru/video-226539531_456239073", views:2000,
+    segments:[
+      { kind:"walk", date:"2026-02-15", start:"", end:"", city:"Екатеринбург", districts:["Ботаника","Уктус"], note:"Смеркалось", adminNote:"в поле «длительность» было: 53:25",
+        route:[[56.79729,60.63484],[56.79732,60.63457],[56.79724,60.634],[56.79702,60.63292],[56.79689,60.63261],[56.79674,60.63252],[56.79626,60.63236],[56.7959,60.63241],[56.79562,60.63258],[56.79519,60.63323],[56.79509,60.6336],[56.79469,60.63416],[56.7946,60.63406],[56.79406,60.63491],[56.79365,60.63548],[56.79281,60.63642],[56.79227,60.63667],[56.79237,60.63872],[56.79242,60.63967],[56.79231,60.64008],[56.79223,60.64031],[56.79275,60.64171],[56.79247,60.64266],[56.79239,60.6427],[56.79254,60.64321],[56.7926,60.64395],[56.79243,60.64416],[56.79232,60.6442],[56.7917,60.64555],[56.79152,60.64563],[56.79118,60.64633],[56.79062,60.64737],[56.78994,60.64734],[56.78976,60.64708],[56.78946,60.64759],[56.78892,60.64748],[56.789,60.64855],[56.78855,60.64798],[56.78799,60.64812],[56.78751,60.64805],[56.78604,60.6497],[56.77946,60.65801],[56.77825,60.66055],[56.77719,60.66306],[56.77671,60.66375],[56.77653,60.66402],[56.77661,60.66417],[56.77687,60.66431],[56.77727,60.66434],[56.77737,60.66445],[56.77758,60.66435],[56.77784,60.66414],[56.77815,60.66385],[56.77828,60.66323],[56.77836,60.6632],[56.77828,60.6639],[56.77777,60.66454],[56.77754,60.66551],[56.77734,60.66634],[56.77717,60.66655],[56.77704,60.66664],[56.77693,60.66677],[56.77688,60.66695],[56.77653,60.66733],[56.77628,60.66773],[56.77614,60.66809],[56.7756,60.66862],[56.77511,60.66903],[56.77475,60.66945]] }
+    ] },
+  { id:26, title:"Прогулка по Екатеринбургу: улица Белинского и Парк им. Павлика Морозова | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=fUbMxONV9Ek&t=1515s", vk:"https://vkvideo.ru/video-226539531_456239072",
+    segments:[
+      { kind:"walk", date:"2026-01-29", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"день",
+        route:[[56.81574,60.62787],[56.81567,60.62768],[56.81562,60.62715],[56.81529,60.62652],[56.81509,60.62501],[56.81529,60.62433],[56.81621,60.62401],[56.81628,60.62373],[56.81694,60.62355],[56.81694,60.62315],[56.81673,60.6208],[56.81697,60.62068],[56.82052,60.61937],[56.82056,60.61944],[56.82047,60.61948],[56.82049,60.6197],[56.82051,60.61996],[56.82049,60.62006],[56.82083,60.61984],[56.82115,60.61955],[56.82144,60.61918],[56.82158,60.61911],[56.822,60.61893],[56.82207,60.61897],[56.82215,60.6191],[56.8222,60.61914],[56.82246,60.61903],[56.82332,60.61876],[56.82339,60.61874],[56.82342,60.61869],[56.82395,60.61849],[56.82393,60.61833],[56.82404,60.61824],[56.8242,60.61822],[56.82425,60.61819],[56.82444,60.61837],[56.82453,60.61851],[56.82503,60.61841],[56.82508,60.61851],[56.82519,60.61847],[56.82534,60.6198],[56.82536,60.61981],[56.82523,60.61845],[56.82547,60.61837],[56.82557,60.61836],[56.82564,60.61871],[56.82587,60.61902],[56.82622,60.61892],[56.8263,60.61955],[56.8263,60.62018],[56.82642,60.62136],[56.82647,60.62187],[56.82601,60.622],[56.8261,60.62289],[56.8247,60.62341],[56.82496,60.62573],[56.82491,60.62584],[56.82468,60.6258],[56.82453,60.62598],[56.82397,60.62619],[56.82374,60.62628],[56.82378,60.62672],[56.82372,60.62687],[56.82373,60.62699],[56.82365,60.62704],[56.82347,60.62734],[56.82275,60.62763],[56.82261,60.62744],[56.82229,60.62702],[56.82159,60.6273],[56.82104,60.6275],[56.82034,60.62774],[56.82021,60.62814],[56.8179,60.62893],[56.81759,60.62841],[56.81759,60.62809],[56.81754,60.62813],[56.81741,60.6265],[56.8172,60.62658],[56.81713,60.62645],[56.81698,60.62623],[56.81643,60.62733],[56.81635,60.62722],[56.81603,60.62752],[56.81602,60.62741],[56.81617,60.62652],[56.81611,60.62616],[56.81631,60.62525],[56.81627,60.624],[56.81582,60.6239]] }
+    ] },
+  { id:27, title:"Прогулка по Екатеринбургу: улица Архангела Михаила и Фестиваль «Энергия РМК. Зима» | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=Jr2ysJOW854&t=1539s", vk:"https://vkvideo.ru/video-226539531_456239070", views:1200,
+    segments:[
+      { kind:"walk", date:"2026-01-08", start:"", end:"", city:"Екатеринбург", districts:["ВИЗ"], note:"Вечер",
+        route:[[56.81193,60.5144],[56.81209,60.51433],[56.81241,60.51552],[56.81278,60.51705],[56.81275,60.51724],[56.8128,60.51742],[56.81303,60.51803],[56.81322,60.51785],[56.81354,60.51893],[56.81379,60.51961],[56.81642,60.52117],[56.8166,60.52126],[56.81679,60.51925],[56.81698,60.51678],[56.81754,60.51373],[56.81776,60.5124],[56.81843,60.51129],[56.81912,60.51015],[56.81904,60.50967],[56.81884,60.50983],[56.81847,60.5101],[56.81819,60.51065],[56.818,60.5107],[56.81781,60.5104],[56.81747,60.51111],[56.81736,60.51149],[56.81736,60.51212],[56.81736,60.51303],[56.8172,60.51356],[56.81668,60.51327],[56.81657,60.51298],[56.81663,60.51245],[56.81695,60.51197],[56.81716,60.51149],[56.81752,60.51088],[56.81774,60.51038],[56.8181,60.50987],[56.81831,60.50987],[56.81827,60.51018],[56.8184,60.51031],[56.81905,60.50952],[56.81907,60.5089],[56.81931,60.50858],[56.81946,60.50884],[56.81912,60.50958],[56.81915,60.51006],[56.81778,60.51221],[56.81742,60.51346],[56.81716,60.51484],[56.81688,60.51694],[56.81672,60.51832],[56.81655,60.52118],[56.81531,60.52046]] }
+    ] },
+  { id:28, title:"Зимний Екатеринбург ❄️ КТТ Космос и сквер Бабыкина | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=rMJQnZKoot4&t=283s", vk:"https://vkvideo.ru/video-226539531_456239069", views:1300,
+    segments:[
+      { kind:"walk", date:"2026-01-04", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"Вечер · ДЕНЬ ВАРЕНЬЯ!",
+        route:[[56.84381,60.60089],[56.84402,60.60056],[56.844,60.60106],[56.84459,60.60156],[56.84508,60.60188],[56.84523,60.60236],[56.84527,60.60279],[56.84537,60.60316],[56.84524,60.60339],[56.84508,60.60428],[56.84496,60.60453],[56.84493,60.60471],[56.84497,60.60537],[56.84498,60.6056],[56.84503,60.60578],[56.84539,60.60618],[56.8457,60.60656],[56.84574,60.60652],[56.84598,60.60684],[56.84638,60.60626],[56.8468,60.60564],[56.84701,60.60265],[56.84769,60.60106],[56.85086,60.59392],[56.85107,60.59425],[56.85138,60.59358],[56.85119,60.59335],[56.85135,60.593],[56.85143,60.59313],[56.85144,60.59283],[56.85109,60.59251],[56.85092,60.59227],[56.85097,60.59215],[56.85092,60.59193],[56.85079,60.59182],[56.85061,60.59155],[56.85056,60.59139],[56.85064,60.59126],[56.8507,60.59112],[56.85081,60.59136],[56.85092,60.59136],[56.8511,60.59112],[56.85129,60.59069],[56.85134,60.59047],[56.85144,60.59068],[56.85132,60.59094]] }
+    ] },
+  { id:29, title:"Зимний центр Екатеринбурга: большая прогулка, Ледовый Городок, Вайнера 2.01.2026 | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=nevELBzZylU", vk:"https://vkvideo.ru/video-226539531_456239067", views:2500,
+    segments:[
+      { kind:"walk", date:"2026-01-02", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"Вечер",
+        route:[[56.83848,60.60437],[56.8382,60.60448],[56.83805,60.60452],[56.83773,60.60399],[56.83773,60.60376],[56.8377,60.60344],[56.83762,60.60261],[56.83779,60.60233],[56.83775,60.60163],[56.83791,60.60157],[56.83766,60.59898],[56.83807,60.59883],[56.83804,60.5985],[56.83793,60.59843],[56.83777,60.59657],[56.83788,60.59654],[56.83797,60.5964],[56.83821,60.59631],[56.83826,60.5963],[56.83832,60.59679],[56.83823,60.59603],[56.83788,60.59583],[56.83769,60.59577],[56.83763,60.59509],[56.83758,60.59478],[56.83715,60.59497],[56.83719,60.59539],[56.83678,60.59558],[56.83675,60.59583],[56.83641,60.59615],[56.83678,60.59535],[56.83671,60.59482],[56.83595,60.5951],[56.83451,60.59564],[56.83415,60.59578],[56.83416,60.59593],[56.83411,60.59581],[56.83383,60.59591],[56.83397,60.59754],[56.8342,60.59955],[56.83426,60.59972],[56.83568,60.59923],[56.8359,60.59922],[56.83586,60.59862],[56.83609,60.5981],[56.836,60.59703],[56.83632,60.59687],[56.83723,60.59652],[56.83734,60.59754],[56.83722,60.59761],[56.83736,60.59779],[56.83746,60.59866],[56.83768,60.5988],[56.83877,60.59839],[56.83879,60.59857],[56.83988,60.59818],[56.84124,60.59769],[56.8411,60.59799],[56.84126,60.59943],[56.8413,60.59999],[56.84056,60.60045],[56.84139,60.6001],[56.84131,60.59926],[56.84122,60.5979],[56.84154,60.59718],[56.84568,60.58695],[56.85445,60.59893],[56.85607,60.60151],[56.8563,60.60378],[56.85007,60.60571],[56.84881,60.60763],[56.84804,60.60869],[56.84524,60.60944],[56.83943,60.61129],[56.83595,60.61237],[56.83569,60.61215],[56.83555,60.61193],[56.83532,60.61185],[56.8344,60.61218],[56.83079,60.61344],[56.82847,60.6142],[56.82765,60.61334],[56.82579,60.6139],[56.82392,60.61449],[56.82369,60.61458],[56.82331,60.61126],[56.81864,60.61302]] }
+    ] },
+  { id:30, title:"Зимний вечер в Екатеринбурге ❄️ | 27.12.2025. Площадь обороны", youtube:"https://www.youtube.com/watch?v=_3eZCHf8sEA", vk:"https://vkvideo.ru/video-226539531_456239066", views:412,
+    segments:[
+      { kind:"walk", date:"2025-12-27", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"Вечер · Снег",
+        route:[[56.82332,60.62968],[56.82327,60.62947],[56.82331,60.63003],[56.8238,60.62882],[56.82374,60.62862],[56.82342,60.62872],[56.82319,60.62841],[56.82352,60.62748],[56.82347,60.62736],[56.8229,60.62759],[56.82273,60.62764],[56.82265,60.62787],[56.82314,60.62833],[56.82266,60.62781],[56.82261,60.62746],[56.8224,60.62736],[56.82231,60.62739],[56.82216,60.62594]] }
+    ] },
+  { id:31, title:"Новогодний базар в ТЦ «Дирижабль» + вечерняя поездка | Екатеринбург | 4K", youtube:"https://www.youtube.com/watch?v=8noCffGXYPw&t=364s", vk:"https://vkvideo.ru/video-226539531_456239065",
+    segments:[
+      { kind:"walk", date:"2025-12-21", start:"", end:"", city:"Екатеринбург", districts:["Ботаника","ВИЗ"], note:"Вечер",
+        route:[[56.79793,60.62728],[56.79776,60.62714],[56.79758,60.6264],[56.79739,60.62661],[56.79705,60.62695],[56.7968,60.62739],[56.79664,60.62705],[56.79661,60.62656],[56.79701,60.62631],[56.79735,60.62626],[56.79781,60.62657],[56.79798,60.62649],[56.79764,60.62395],[56.79769,60.61114],[56.79987,60.61183],[56.80013,60.6129],[56.8056,60.61093],[56.80537,60.60833],[56.80824,60.60728],[56.80672,60.59144],[56.82113,60.55295],[56.82093,60.55307],[56.82075,60.5534],[56.82006,60.55209],[56.81849,60.54738],[56.81692,60.54907],[56.81666,60.54972],[56.81607,60.54906]] }
+    ] },
+  { id:32, title:"Прогулка по центру Екатеринбурга в декабре | 4K Walking Vlog", youtube:"https://www.youtube.com/watch?v=KoaDS5g8Eb8&t=1142s", vk:"https://vkvideo.ru/video-226539531_456239064", views:2600,
+    segments:[
+      { kind:"walk", date:"2025-12-13", start:"", end:"", city:"Екатеринбург", districts:["Центр"], note:"Вечер · Снег",
+        route:[[56.83523,60.61376],[56.83516,60.61283],[56.8352,60.6117],[56.83523,60.61162],[56.835,60.60948],[56.83476,60.60955],[56.83482,60.61012],[56.83472,60.60957],[56.83448,60.60964],[56.83392,60.60984],[56.83388,60.60966],[56.83315,60.60987],[56.83284,60.60999],[56.83277,60.60955],[56.83294,60.6095],[56.83276,60.60951],[56.83275,60.60929],[56.83284,60.60938],[56.83278,60.6092],[56.83274,60.60916],[56.83257,60.60788],[56.83205,60.60808],[56.83185,60.60802],[56.83156,60.60805],[56.83131,60.60812],[56.83093,60.60827],[56.82884,60.60898],[56.82875,60.60897],[56.82857,60.60721],[56.82816,60.60732],[56.82811,60.60697],[56.82833,60.60627],[56.82832,60.60613],[56.82824,60.60608],[56.82827,60.60586],[56.82783,60.6058],[56.82771,60.60584],[56.82772,60.60615],[56.82759,60.60621],[56.8273,60.6036],[56.82706,60.60376],[56.82718,60.60466],[56.827,60.60492],[56.82704,60.60542],[56.82659,60.60593],[56.82647,60.60637],[56.82637,60.60645],[56.82629,60.60676],[56.82532,60.60701],[56.82521,60.60707],[56.82527,60.60768],[56.82533,60.60835],[56.82551,60.60843],[56.82558,60.60857],[56.82561,60.60885],[56.8256,60.60904],[56.82567,60.60914],[56.8257,60.60929],[56.82558,60.60946],[56.82563,60.60993],[56.82556,60.61044],[56.82494,60.61116]] }
+    ] },
+  { id:33, title:"ВНЕЗАПНЫЙ СНЕГОПАД В КОНЦЕ НОЯБРЯ - vlog walk 4K", youtube:"https://www.youtube.com/watch?v=ofv_Ql9PRws&t=11s", vk:"https://vkvideo.ru/video-226539531_456239061",
+    segments:[
+      { kind:"walk", date:"2026-11-05", start:"22:00", end:"", city:"Екатеринбург", districts:["Южный Автовокзал"], note:"Вечер",
+        route:[[56.81172,60.62203],[56.81014,60.62256],[56.81,60.62264],[56.80927,60.61583],[56.80863,60.61015],[56.81327,60.60847],[56.81324,60.60818],[56.81441,60.60771],[56.81447,60.60756],[56.8146,60.60759],[56.8147,60.60765],[56.81554,60.60733],[56.8156,60.60786],[56.81579,60.61027],[56.81606,60.61379],[56.81396,60.61467],[56.81441,60.61994],[56.81398,60.6201],[56.81405,60.62069],[56.81361,60.62084],[56.8136,60.62097]] }
+    ] },
+  { id:34, title:"Зимний вечер в Екатеринбурге ❄️ люди, огни и жизнь большого района", youtube:"https://www.youtube.com/watch?v=ERUKF4_BLKg&t=23s", vk:"https://vkvideo.ru/video-226539531_456239048",
+    segments:[
+      { kind:"walk", date:"2025-01-02", start:"", end:"", city:"Екатеринбург", districts:["Академический"], note:"Вечер · Горки!",
+        route:[[56.77862,60.52257],[56.7789,60.52224],[56.77948,60.52176],[56.77979,60.52109],[56.78078,60.5194],[56.78116,60.51856],[56.78159,60.51848],[56.78161,60.51946],[56.78202,60.51912],[56.78221,60.51834],[56.78204,60.51685],[56.78184,60.5166],[56.78173,60.51607],[56.78211,60.5154],[56.78248,60.51548],[56.78292,60.5149],[56.78372,60.51413],[56.78377,60.51366],[56.78278,60.51238],[56.78258,60.5123],[56.7825,60.51155],[56.7843,60.51052],[56.78533,60.50909],[56.78562,60.50863],[56.78673,60.50685],[56.78765,60.50512],[56.78748,60.5048],[56.78734,60.50441],[56.78746,60.50398],[56.78765,60.50433],[56.78784,60.50403],[56.78724,60.50427],[56.78737,60.50551],[56.78702,60.50605],[56.78686,60.50596],[56.78686,60.50638],[56.78624,60.50768],[56.78565,60.50876],[56.78578,60.50901],[56.78558,60.50992],[56.78559,60.51008],[56.7853,60.51176],[56.78515,60.51164],[56.78575,60.5127],[56.78683,60.51084],[56.78713,60.5114],[56.78709,60.51155],[56.78723,60.51155],[56.78644,60.51312],[56.78603,60.51331],[56.78575,60.51282],[56.78575,60.51282],[56.78462,60.51467],[56.78231,60.51884],[56.78122,60.51733]] }
+    ] }
 ];
+const POIS = [
+
+];
+const SITE = {
+  goal: ""
+};
 /* ===================================================================== */
 
 /* ---------- настройки ---------- */
-/* Ссылка на поддержку канала. Пока пусто — кнопка «Поддержать» выключена.
-   Когда появится настоящая ссылка, вставь её между кавычками: const SUPPORT_URL = 'https://...'; */
-const SUPPORT_URL = '';
-const ORANGE = '#ff8a3d', SEL = '#ff6b57', CASING = '#140a24';
+/* Ссылка на поддержку канала (CloudTips). Пустая строка — кнопка выключена. */
+const SUPPORT_URL = 'https://pay.cloudtips.ru/p/ae5a9fd5';
+/* Ключ YouTube Data API для автоматических просмотров. Пока пусто — просмотры не обновляются сами. */
+const YT_API_KEY = '';
+const ORANGE = '#ff8a3d', ACTIVE = '#ff2e74', CASING = '#140a24';
 const REDUCE = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
 const map = L.map('map', { zoomControl:true }).setView([56.8389, 60.6057], 12);
@@ -347,25 +504,15 @@ base.addTo(map);
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone = o => JSON.parse(JSON.stringify(o));
+const q = v => JSON.stringify(v).replace(/</g, '\\u003c');           /* безопасно для вставки в <script> */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 const safeUrl = u => /^https?:\/\//i.test(String(u || '').trim()) ? String(u).trim() : '';
-const normUrl = u => { u = String(u || '').trim(); return u ? (safeUrl(u) || 'https://' + u) : ''; };   /* без https:// дописываем сами */
+const normUrl = u => { u = String(u || '').trim(); return u ? (safeUrl(u) || 'https://' + u) : ''; };
 const isVk = u => /^(?:https?:\/\/)?(?:[\w-]+\.)*(?:vk\.com|vk\.ru|vkvideo\.ru|vk\.cc)(?:[\/:?#]|$)/i.test(String(u || '').trim());
-/* у каждой прогулки две необязательные ссылки: youtube и vk. Старое поле url — это ссылка на YouTube (или VK, если по виду она оттуда) */
-function normWalk(w){
-  const o = { ...w };
-  if(o.url){ const k = isVk(o.url) ? 'vk' : 'youtube'; if(!o[k]) o[k] = o.url; }
-  delete o.url;
-  return o;
-}
-const ytUrl = w => safeUrl(w.youtube), vkUrl = w => safeUrl(w.vk);
-const hasVideo = w => !!(ytUrl(w) || vkUrl(w));
-function videoBtns(w, cls){
-  const y = ytUrl(w), v = vkUrl(w);
-  return (y ? `<a class="${cls} yt" href="${esc(y)}" target="_blank" rel="noopener">▶ YouTube</a>` : '')
-       + (v ? `<a class="${cls} vk" href="${esc(v)}" target="_blank" rel="noopener">▶ VK Видео</a>` : '');
-}
-const freshWalks = () => clone(WALKS).map(normWalk);
 const today = () => new Date().toLocaleDateString('sv-SE');
+const fmtNum = n => Number(n).toLocaleString('ru-RU');
+const dedupeSeq = a => a.filter((x,i) => i === 0 || x !== a[i-1]);
+const splitList = s => String(s || '').split(/[,;\n]+/).map(x => x.trim()).filter(Boolean);
 function dist(route){
   const R = 6371, rad = x => x*Math.PI/180; let d = 0;
   for(let i=1;i<route.length;i++){
@@ -376,26 +523,165 @@ function dist(route){
   }
   return d;
 }
-const kmOf = w => w.km ?? dist(w.route);
-const fmtDate = s => { const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}); };
+const fmtDate = s => { const d = new Date(s); return (!s || isNaN(d)) ? (s || '') : d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}); };
+const fmtShort = s => { const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'}); };
+function fmtMin(total){
+  let h = Math.floor(total/60), m = Math.round(total - h*60);
+  if(m === 60){ h++; m = 0; }
+  return h ? `${h} ч ${m} м` : `${m} м`;
+}
+/* время "H:MM" → "HH:MM"; всё остальное → пусто */
+function normTime(s){
+  const m = String(s || '').trim().match(/^(\d{1,2}):(\d{2})$/);
+  if(!m || +m[1] > 23 || +m[2] > 59) return '';
+  return String(m[1]).padStart(2,'0') + ':' + m[2];
+}
+const partOfDay = t => { const h = +t.slice(0,2); return h >= 5 && h < 11 ? 'утро' : h >= 11 && h < 17 ? 'день' : h >= 17 && h < 22 ? 'вечер' : 'ночь'; };
+/* конец раньше начала — значит съёмка закончилась на следующий день */
+const minsBetween = (a, b) => { const x = a.split(':').map(Number), y = b.split(':').map(Number); let d = (y[0]*60 + y[1]) - (x[0]*60 + x[1]); if(d <= 0) d += 1440; return d; };
 
 /* id видео из ссылки: watch?v=, youtu.be/, shorts/, embed/ (+ live/, v/) */
 function ytId(u){
   const m = String(u || '').trim().match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|shorts\/|embed\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/i);
   return m ? m[1] : '';
 }
-/* длительность "1:05" (ч:мм) или "1:05:30" → минуты; непонятный формат → null */
-function parseDur(s){
-  const m = String(s || '').trim().match(/^(\d+):(\d{1,2})(?::(\d{1,2}))?$/);
-  if(!m || +m[2] > 59 || (m[3] && +m[3] > 59)) return null;
-  return +m[1]*60 + +m[2] + (m[3] ? +m[3]/60 : 0);
+
+/* ---------- приведение данных к одному виду (старые записи читаются как есть) ---------- */
+function normSeg(s){
+  const o = {
+    kind: s.kind === 'vlog' ? 'vlog' : 'walk',
+    date: String(s.date || ''),
+    start: normTime(s.start), end: normTime(s.end),
+    city: String(s.city || '').trim(),
+    districts: Array.isArray(s.districts) ? s.districts.map(x => String(x).trim()).filter(Boolean) : [],
+    route: Array.isArray(s.route) ? s.route : []
+  };
+  if(s.note) o.note = String(s.note);
+  if(s.adminNote) o.adminNote = String(s.adminNote);   /* заметка для себя: видна только в админке */
+  if(Number.isFinite(s.km)) o.km = s.km;
+  if(s.weather && Number.isFinite(s.weather.t)) o.weather = s.weather;
+  return o;
 }
-function fmtMin(total){
-  let h = Math.floor(total/60), m = Math.round(total - h*60);
-  if(m === 60){ h++; m = 0; }
-  return h ? `${h} ч ${m} м` : `${m} м`;
+function normWalk(w){
+  let yt = String(w.youtube || ''), vk = String(w.vk || '');
+  if(w.url){ const k = isVk(w.url) ? 'vk' : 'yt'; if(k === 'vk' ? !vk : !yt){ k === 'vk' ? (vk = w.url) : (yt = w.url); } }
+  const o = { id:w.id, title:String(w.title || ''), youtube:yt, vk:vk };
+  if(Number.isFinite(w.views)) o.views = w.views;
+  if(Array.isArray(w.segments) && w.segments.length){ o.segments = w.segments.map(normSeg); return o; }
+  /* старый формат: одна прогулка прямо в записи (date, district, time, duration, route) */
+  const seg = { kind:w.kind, date:w.date, city:w.city, route:w.route, km:w.km, districts:[] };
+  if(Array.isArray(w.districts)) seg.districts = w.districts;
+  else if(w.district && !/^без района$/i.test(String(w.district).trim())) seg.districts = dedupeSeq(String(w.district).split(/\s+[-–—]\s+/).map(x => x.trim()).filter(Boolean));
+  const notes = [];
+  const t = String(w.time || '').trim();
+  if(t){ if(normTime(t)) seg.start = t; else if(/^влог$/i.test(t)) seg.kind = 'vlog'; else notes.push(t); }
+  const d = String(w.duration || '').trim(); if(d) notes.push(d);
+  if(w.note) notes.push(String(w.note));
+  if(notes.length) seg.note = notes.join(' · ');
+  o.segments = [normSeg(seg)];
+  return o;
 }
-const fmtNum = n => Number(n).toLocaleString('ru-RU');
+const normPoi = p => ({ id:p.id, emoji:p.emoji || '📷', title:String(p.title || ''), date:String(p.date || ''), city:String(p.city || ''), note:String(p.note || ''),
+                        pos:Array.isArray(p.pos) ? p.pos : [0,0], photo:String(p.photo || '') });
+const freshData = () => ({ walks:clone(WALKS).map(normWalk), pois:clone(POIS).map(normPoi), site:{ goal:String((SITE && SITE.goal) || '') } });
+
+/* ---------- величины, которые считаются из данных ---------- */
+const ytUrl = w => safeUrl(w.youtube), vkUrl = w => safeUrl(w.vk);
+const hasVideo = w => !!(ytUrl(w) || vkUrl(w));
+const segKm = s => Number.isFinite(s.km) ? s.km : (s.route.length > 1 ? dist(s.route) : 0);
+const walkKm = w => w.segments.reduce((a,s) => a + segKm(s), 0);
+const segDur = s => (s.start && s.end) ? minsBetween(s.start, s.end) : 0;
+const segTime = s => s.start ? `${s.start}${s.end ? '–' + s.end : ''} (${partOfDay(s.start)})` : '';
+const cityKey = s => s.city || 'Без города';
+const walkDate = w => { const d = w.segments.map(s => s.date).filter(Boolean).sort(); return d[0] || ''; };
+function fmtWalkDate(w){
+  const d = w.segments.map(s => s.date).filter(Boolean).sort();
+  if(!d.length) return '';
+  return d[0] === d[d.length-1] ? fmtDate(d[0]) : `${fmtShort(d[0])} – ${fmtDate(d[d.length-1])}`;
+}
+function videoBtns(w, cls){
+  const y = ytUrl(w), v = vkUrl(w);
+  return (y ? `<a class="${cls} yt" href="${esc(y)}" target="_blank" rel="noopener">▶ YouTube</a>` : '')
+       + (v ? `<a class="${cls} vk" href="${esc(v)}" target="_blank" rel="noopener">▶ VK Видео</a>` : '');
+}
+
+/* ---------- погода: коды WMO → слова ---------- */
+const WX = { 0:['☀️','ясно'],1:['🌤','малооблачно'],2:['⛅','переменная облачность'],3:['☁️','пасмурно'],45:['🌫','туман'],48:['🌫','изморозь'],
+  51:['🌦','морось'],53:['🌦','морось'],55:['🌦','сильная морось'],56:['🌧','ледяная морось'],57:['🌧','ледяная морось'],
+  61:['🌧','небольшой дождь'],63:['🌧','дождь'],65:['🌧','сильный дождь'],66:['🌧','ледяной дождь'],67:['🌧','ледяной дождь'],
+  71:['🌨','небольшой снег'],73:['🌨','снег'],75:['❄️','сильный снег'],77:['🌨','снежная крупа'],80:['🌦','ливень'],81:['🌧','ливень'],82:['⛈','сильный ливень'],
+  85:['🌨','снегопад'],86:['🌨','сильный снегопад'],95:['⛈','гроза'],96:['⛈','гроза с градом'],99:['⛈','гроза с градом'] };
+function weatherText(w){
+  const [em, tx] = WX[w.code] || ['🌡', ''];
+  const t = Math.round(w.t);
+  return `${em} ${t > 0 ? '+' : ''}${t}°C${tx ? ', ' + tx : ''}${Number.isFinite(w.wind) ? `, ветер ${Math.round(w.wind)} м/с` : ''}${w.prec > 0 ? `, осадки ${w.prec} мм` : ''}`;
+}
+
+/* ---------- запросы к бесплатным сервисам (только админка) ---------- */
+async function fetchT(url, ms){
+  const c = new AbortController(), t = setTimeout(() => c.abort(), ms || 9000);
+  try{ return await fetch(url, { signal:c.signal }); } finally { clearTimeout(t); }
+}
+/* Open-Meteo: погода на дату и час начала съёмки, без ключа */
+async function fetchWeather(lat, lng, date, start){
+  if(!date || !normTime(start)) return null;
+  const hh = +start.slice(0,2);
+  const qs = `latitude=${(+lat).toFixed(4)}&longitude=${(+lng).toFixed(4)}&start_date=${date}&end_date=${date}&hourly=temperature_2m,precipitation,weather_code,wind_speed_10m&wind_speed_unit=ms&timezone=auto`;
+  for(const url of ['https://archive-api.open-meteo.com/v1/archive?', 'https://api.open-meteo.com/v1/forecast?']){
+    try{
+      const r = await fetchT(url + qs); if(!r.ok) continue;
+      const h = (await r.json()).hourly;
+      if(h && h.temperature_2m && h.temperature_2m[hh] != null)
+        return { t:Math.round(h.temperature_2m[hh]*10)/10, code:h.weather_code ? h.weather_code[hh] : null, wind:h.wind_speed_10m ? Math.round(h.wind_speed_10m[hh]*10)/10 : null, prec:h.precipitation ? h.precipitation[hh] : 0 };
+    }catch(_){}
+  }
+  return null;
+}
+/* Nominatim (OpenStreetMap): город и район по точке, без ключа, не чаще 1 запроса в секунду */
+async function geocode(p){
+  try{
+    const r = await fetchT(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&addressdetails=1&accept-language=ru&lat=${(+p[0]).toFixed(5)}&lon=${(+p[1]).toFixed(5)}`);
+    if(!r.ok) return null;
+    const a = (await r.json()).address || {};
+    return { city: a.city || a.town || a.village || a.hamlet || a.municipality || '',
+             district: a.suburb || a.neighbourhood || a.quarter || a.city_district || a.district || '' };
+  }catch(_){ return null; }
+}
+function samplePts(r){
+  if(r.length <= 1) return r.slice(0,1);
+  const km = dist(r), n = Math.max(2, Math.min(6, Math.ceil(km/1.5) + 1));
+  const cum = [0]; for(let i=1;i<r.length;i++) cum.push(cum[i-1] + dist([r[i-1], r[i]]));
+  const out = [];
+  for(let k=0;k<n;k++){ const t = km * k/(n-1); let i = cum.findIndex(c => c >= t); if(i < 0) i = r.length - 1; out.push(r[i]); }
+  return out;
+}
+async function detectPlace(route){
+  const found = [], pts = samplePts(route);
+  for(let i=0;i<pts.length;i++){ if(i) await sleep(1100); const g = await geocode(pts[i]); if(g) found.push(g); }
+  if(!found.length) return null;
+  const cnt = {}; found.forEach(f => { if(f.city) cnt[f.city] = (cnt[f.city] || 0) + 1; });
+  const city = Object.keys(cnt).sort((a,b) => cnt[b] - cnt[a])[0] || '';
+  return { city, districts: dedupeSeq(found.map(f => f.district).filter(Boolean)) };
+}
+
+/* ---------- просмотры с YouTube (нужен ключ YT_API_KEY) ---------- */
+let ytViews = {};
+const viewsOf = w => { const id = ytId(w.youtube); if(id && Number.isFinite(ytViews[id])) return ytViews[id]; return Number.isFinite(w.views) && w.views > 0 ? w.views : null; };
+async function loadViews(){
+  if(!YT_API_KEY) return;
+  const ids = [...new Set(walks.map(w => ytId(w.youtube)).filter(Boolean))]; if(!ids.length) return;
+  let cache = null; try{ cache = JSON.parse(store.get(KEY_VIEWS) || 'null'); }catch(_){}
+  if(cache && Date.now() - cache.t < 6*3600e3 && ids.every(i => i in cache.m)){ ytViews = cache.m; refreshViews(); return; }
+  const m = {};
+  for(let i=0;i<ids.length;i+=50){
+    try{
+      const r = await fetchT(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids.slice(i,i+50).join(',')}&key=${encodeURIComponent(YT_API_KEY)}`);
+      ((await r.json()).items || []).forEach(it => { if(it.statistics) m[it.id] = +it.statistics.viewCount; });
+    }catch(_){}
+  }
+  if(Object.keys(m).length){ ytViews = m; store.set(KEY_VIEWS, JSON.stringify({ t:Date.now(), m })); refreshViews(); }
+}
+function refreshViews(){ render(false); if(activeId != null){ const w = walks.find(x => x.id === activeId); if(w) showInfo(walkInfoHtml(w)); } }
 
 /* ---------- хранилище (только браузер админа и настройка звука) ---------- */
 const store = {
@@ -404,22 +690,22 @@ const store = {
   del(k){ try{ localStorage.removeItem(k); }catch(_){} }
 };
 const hash = s => { let h = 5381; for(let i=0;i<s.length;i++) h = ((h<<5)+h+s.charCodeAt(i))|0; return String(h); };
-const BASE_SIG = hash(JSON.stringify(WALKS));
-const KEY_DRAFT = 'kp_draft_v1', KEY_ADMIN = 'kp_admin', KEY_SND = 'kp_sound';
+const BASE_SIG = hash(JSON.stringify([WALKS, POIS, SITE]));
+const KEY_DRAFT = 'kp_draft_v1', KEY_ADMIN = 'kp_admin', KEY_SND = 'kp_sound', KEY_VIEWS = 'kp_views';
 
 function loadDraft(){
   const raw = store.get(KEY_DRAFT); if(!raw) return null;
   try{
     const d = JSON.parse(raw);
-    /* если файл со списком поменялся после черновика — черновик устарел */
-    if(d.sig === BASE_SIG && Array.isArray(d.walks)) return d.walks.map(normWalk);
+    /* если данные в файле поменялись после черновика — черновик устарел */
+    if(d.sig === BASE_SIG && Array.isArray(d.walks)) return { walks:d.walks.map(normWalk), pois:(d.pois || []).map(normPoi), site:{ goal:String((d.site && d.site.goal) || '') } };
   }catch(_){}
   store.del(KEY_DRAFT);
   return null;
 }
 function saveDraft(){
-  const ok = store.set(KEY_DRAFT, JSON.stringify({ sig:BASE_SIG, walks }));
-  if(!ok) alert('Браузер не дал сохранить правки у себя. Выгрузи список в файл прямо сейчас, иначе правки пропадут при закрытии страницы.');
+  const ok = store.set(KEY_DRAFT, JSON.stringify({ sig:BASE_SIG, walks, pois, site }));
+  if(!ok) alert('Браузер не дал сохранить правки у себя (скорее всего, мало места из-за фото). Выгрузи список в файл прямо сейчас, иначе правки пропадут при закрытии страницы.');
 }
 
 /* ---------- звуки (Web Audio, без файлов; по умолчанию выключены) ---------- */
@@ -469,63 +755,74 @@ document.addEventListener('click', e => {
 
 /* ---------- состояние ---------- */
 let isAdmin = false;
-let walks = freshWalks();
+let walks = [], pois = [], site = { goal:'' };
 let layers = {};
-let activeId = null, district = 'Все';
+let activeId = null, activePoi = null;
+let fKind = 'all', fCity = 'Все', district = 'Все', showPois = true;
 let drawing = false, editId = null, pts = [];
-let animToken = 0;
+let poiMode = false, poiDraft = null, poiTmp = null;
+let animToken = 0, selStamp = 0;
 
-/* ---------- слои на карте ---------- */
+/* ---------- маршруты на карте ---------- */
 function mkIcon(cls, glyph){
   return L.divIcon({ className:'mk-wrap', html:`<div class="mk ${cls}">${glyph}</div>`, iconSize:[28,28], iconAnchor:[14,14] });
 }
-function popupHtml(w){
-  return `<div class="pop"><h3>${esc(w.title)}</h3>
-     <div class="meta"><span>📅 ${esc(fmtDate(w.date))}</span><span>📍 ${esc(w.district)}</span><span>🕒 ${esc(w.time)}</span>
-     <span>📏 ${kmOf(w).toFixed(1)} км</span>${w.duration ? `<span>⏱ ${esc(w.duration)}</span>` : ''}${Number.isFinite(w.views) ? `<span>👁 ${fmtNum(w.views)}</span>` : ''}</div>
-     ${hasVideo(w) ? `<div class="vb">${videoBtns(w, 'vbtn')}</div>` : ''}</div>`;
-}
-function buildLayers(){
-  animToken++;
-  Object.values(layers).forEach(l => { clearAnim(l); map.removeLayer(l.group); });
-  layers = {};
-  walks.forEach(w => {
-    const ll = w.route, round = { lineCap:'round', lineJoin:'round' };
-    const casing = L.polyline(ll, { ...round, color:CASING, weight:10, opacity:.8, interactive:false });          /* тёмная подложка */
-    const glow   = L.polyline(ll, { ...round, color:SEL, weight:17, opacity:0, className:'route-glow', interactive:false }); /* свечение выбранного */
-    const line   = L.polyline(ll, { ...round, color:ORANGE, weight:5.5, opacity:1, interactive:false });         /* сам маршрут */
-    const hit    = L.polyline(ll, { color:'#000', weight:22, opacity:0, interactive:true });                      /* широкая зона клика */
-    const start  = L.marker(ll[0], { icon:mkIcon('start','▶'), title:'Старт', keyboard:false, zIndexOffset:500 });
-    const end    = L.marker(ll[ll.length-1], { icon:mkIcon('end','■'), title:'Финиш', keyboard:false, zIndexOffset:400 });
-    const html = popupHtml(w);
-    [hit, start, end].forEach(x => { x.bindPopup(html); x.on('click', () => { if(!drawing) select(w.id, false); }); });
-    hit.on('mouseover', () => { if(!drawing && w.id !== activeId) line.setStyle({ weight:7 }); });
-    hit.on('mouseout',  () => { if(w.id !== activeId) line.setStyle({ weight:5.5 }); });
-    layers[w.id] = { casing, glow, line, hit, start, end, group: L.layerGroup([casing, glow, line, hit, start, end]) };
+const STY = {
+  normal:{ casing:{ color:CASING, weight:10, opacity:.8 },    glow:{ opacity:0 },   line:{ color:ORANGE, weight:5.5, opacity:1 },   mk:1 },
+  dim:   { casing:{ color:CASING, weight:8,  opacity:.12 },   glow:{ opacity:0 },   line:{ color:ORANGE, weight:4,   opacity:.28 },  mk:.3 },
+  active:{ casing:{ color:'#ffffff', weight:13, opacity:.95 }, glow:{ opacity:.55 }, line:{ color:ACTIVE, weight:6.5, opacity:1 },   mk:1 }
+};
+const modeOf = id => activeId == null ? 'normal' : (id === activeId ? 'active' : 'dim');
+function paintWalk(id, mode){
+  const l = layers[id]; if(!l) return;
+  const st = STY[mode];
+  l.segs.forEach(s => {
+    clearAnim(s);
+    if(s.single){ s.single.setOpacity(st.mk); return; }
+    s.casing.setStyle(st.casing); s.glow.setStyle(st.glow); s.line.setStyle(st.line);
+    s.start.setOpacity(st.mk); s.end.setOpacity(st.mk);
   });
 }
-function setStyleFor(id, on){
-  const l = layers[id]; if(!l) return;
-  clearAnim(l);
-  if(on){
-    l.casing.setStyle({ weight:12, opacity:.9 });
-    l.glow.setStyle({ opacity:.5 });
-    l.line.setStyle({ color:SEL, weight:6.5 });
-  } else {
-    l.casing.setStyle({ weight:10, opacity:.8 });
-    l.glow.setStyle({ opacity:0 });
-    l.line.setStyle({ color:ORANGE, weight:5.5 });
-  }
+function paintAll(){ walks.forEach(w => paintWalk(w.id, modeOf(w.id))); }
+function buildLayers(){
+  animToken++;
+  Object.values(layers).forEach(l => { l.segs.forEach(clearAnim); map.removeLayer(l.group); });
+  layers = {};
+  walks.forEach(w => {
+    const parts = [], segs = [];
+    const hook = x => x.on('click', () => { if(!drawing && !poiMode) select(w.id, false); });
+    w.segments.forEach(s => {
+      const ll = s.route; if(!ll.length) return;
+      if(ll.length === 1){
+        const m = L.marker(ll[0], { icon:mkIcon('vlog','🎬'), title:'Влог', keyboard:false, zIndexOffset:500 });
+        hook(m); parts.push(m); segs.push({ single:m }); return;
+      }
+      const round = { lineCap:'round', lineJoin:'round' };
+      const casing = L.polyline(ll, { ...round, color:CASING, weight:10, opacity:.8, interactive:false });                        /* тёмная подложка */
+      const glow   = L.polyline(ll, { ...round, color:ACTIVE, weight:17, opacity:0, className:'route-glow', interactive:false }); /* свечение выбранного */
+      const line   = L.polyline(ll, { ...round, color:ORANGE, weight:5.5, opacity:1, interactive:false });                        /* сам маршрут */
+      const hit    = L.polyline(ll, { color:'#000', weight:22, opacity:0, interactive:true, bubblingMouseEvents:false });          /* широкая зона клика */
+      const start  = L.marker(ll[0], { icon:mkIcon('start','▶'), title:'Старт', keyboard:false, zIndexOffset:500 });
+      const end    = L.marker(ll[ll.length-1], { icon:mkIcon('end','■'), title:'Финиш', keyboard:false, zIndexOffset:400 });
+      [hit, start, end].forEach(hook);
+      hit.on('mouseover', () => { if(!drawing){ const st = STY[modeOf(w.id)]; if(modeOf(w.id) !== 'active') line.setStyle({ weight:st.line.weight + 1.5, opacity:Math.max(st.line.opacity, .85) }); } });
+      hit.on('mouseout',  () => { if(modeOf(w.id) !== 'active') line.setStyle(STY[modeOf(w.id)].line); });
+      parts.push(casing, glow, line, hit, start, end);
+      segs.push({ casing, glow, line, hit, start, end });
+    });
+    layers[w.id] = { segs, group: L.layerGroup(parts) };
+  });
+  paintAll();
 }
 /* плавная прорисовка маршрута (один path, без перерисовки карты) */
-function clearAnim(l){
-  clearTimeout(l.animT);
-  const p = l.line && l.line.getElement && l.line.getElement();
+function clearAnim(s){
+  clearTimeout(s.animT);
+  const p = s.line && s.line.getElement && s.line.getElement();
   if(p){ p.style.transition = ''; p.style.strokeDasharray = ''; p.style.strokeDashoffset = ''; }
 }
-function drawRoute(l){
-  if(REDUCE) return;
-  const p = l.line.getElement(); if(!p || !p.getTotalLength) return;
+function drawRoute(s){
+  if(REDUCE || !s.line) return;
+  const p = s.line.getElement(); if(!p || !p.getTotalLength) return;
   let len; try{ len = p.getTotalLength(); }catch(_){ return; }
   if(!(len > 0)) return;
   p.style.transition = 'none';
@@ -535,60 +832,154 @@ function drawRoute(l){
   const dur = Math.min(1600, Math.max(700, len * .9));
   p.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.4,0,.2,1)`;
   p.style.strokeDashoffset = 0;
-  l.animT = setTimeout(() => clearAnim(l), dur + 80);
+  s.animT = setTimeout(() => clearAnim(s), dur + 80);
+}
+
+/* ---------- точки интереса ---------- */
+const poiLayer = L.layerGroup().addTo(map);
+let poiMarkers = {};
+const poiPhotoOk = p => /^data:image\/(jpeg|png|webp|gif);base64,/i.test(p) || !!safeUrl(p);
+function buildPois(){
+  poiLayer.clearLayers(); poiMarkers = {};
+  pois.forEach(p => {
+    const m = L.marker(p.pos, { icon:L.divIcon({ className:'poi-wrap', html:`<div class="poi">${esc(p.emoji)}</div>`, iconSize:[30,30], iconAnchor:[15,15] }), title:p.title, keyboard:false, zIndexOffset:600 });
+    m.on('click', () => { if(!drawing && !poiMode) selectPoi(p.id); });
+    poiMarkers[p.id] = m; m.addTo(poiLayer);
+  });
+  $('poiCnt').textContent = pois.length ? `(${pois.length})` : '';
+  $('poiTog').style.display = (pois.length || isAdmin) ? '' : 'none';
+}
+$('poiChk').addEventListener('change', e => {
+  showPois = e.target.checked;
+  showPois ? poiLayer.addTo(map) : map.removeLayer(poiLayer);
+  if(!showPois && activePoi != null){ activePoi = null; hideInfo(); updateAdminUI(); }
+});
+function poiInfoHtml(p){
+  return `<h3>${esc(p.emoji)} ${esc(p.title)}</h3>
+    ${p.photo && poiPhotoOk(p.photo) ? `<img class="pphoto" src="${esc(p.photo)}" alt="">` : ''}
+    <div class="segm">${[fmtDate(p.date), p.city].filter(Boolean).map(esc).join(' · ')}</div>
+    ${p.note ? `<div class="segb" style="border:0;padding:6px 0 0">${esc(p.note)}</div>` : ''}`;
+}
+function selectPoi(id){
+  const p = pois.find(x => x.id === id); if(!p) return;
+  selStamp = Date.now();
+  activePoi = id;
+  if(activeId != null){ activeId = null; paintAll(); markActive(); }
+  showInfo(poiInfoHtml(p));
+  play('select');
+  updateAdminUI();
+}
+
+/* ---------- карточка сбоку (вместо всплывающего окна поверх маршрута) ---------- */
+function showInfo(html){ $('infoBody').innerHTML = html; $('infoCard').hidden = false; }
+function hideInfo(){ $('infoCard').hidden = true; $('infoBody').innerHTML = ''; }
+$('infoX').addEventListener('click', () => deselect());
+function segInfoHtml(s, i, multi){
+  const d = segDur(s), km = segKm(s);
+  const head = [(s.kind === 'vlog' ? '🎬 Влог' : '🚶 Прогулка') + (multi ? ` · маршрут ${i+1}` : ''), fmtDate(s.date), segTime(s), d ? fmtMin(d) : ''].filter(Boolean).join(' · ');
+  const place = [s.city, dedupeSeq(s.districts).join(' → ')].filter(Boolean).join(' · ');
+  const rows = [`<div class="segh">${esc(head)}</div>`];
+  if(place || km > 0) rows.push(`<div class="segm">${place ? '📍 ' + esc(place) : ''}${place && km > 0 ? ' · ' : ''}${km > 0 ? '📏 ' + km.toFixed(1) + ' км' : ''}</div>`);
+  if(s.note) rows.push(`<div class="segm">💬 ${esc(s.note)}</div>`);
+  if(isAdmin && s.adminNote) rows.push(`<div class="segm" style="color:#ffb347">🛠 Для себя: ${esc(s.adminNote)}</div>`);
+  if(s.weather) rows.push(`<div class="segw">${esc(weatherText(s.weather))}</div>`);
+  return `<div class="segb">${rows.join('')}</div>`;
+}
+function walkInfoHtml(w){
+  const v = viewsOf(w), multi = w.segments.length > 1;
+  return `<h3>${esc(w.title)}</h3>
+    ${w.segments.map((s,i) => segInfoHtml(s, i, multi)).join('')}
+    ${v != null ? `<div class="segb">👁 ${fmtNum(v)} просмотров на YouTube</div>` : ''}
+    ${hasVideo(w) ? `<div class="vb">${videoBtns(w, 'watch')}</div>` : ''}
+    ${w.segments.some(s => s.weather) ? `<div class="credit">Погода: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></div>` : ''}`;
 }
 
 /* ---------- фильтры, статистика и список ---------- */
-function buildChips(){
-  const ds = ['Все', ...new Set(walks.map(w => w.district))];
-  if(!ds.includes(district)) district = 'Все';
-  $('chips').innerHTML = ds.map(d => `<button class="chip${d===district?' on':''}" data-d="${esc(d)}">${esc(d)}</button>`).join('');
+const chip = (attr, val, label, n, on) => `<button class="chip${on ? ' on' : ''}" ${attr}="${esc(val)}">${esc(label)}${n != null ? `<span class="cnt">${n}</span>` : ''}</button>`;
+function buildFilters(){
+  const cc = new Map();
+  walks.forEach(w => new Set(w.segments.map(cityKey)).forEach(c => cc.set(c, (cc.get(c) || 0) + 1)));
+  const cities = [...cc.entries()].sort((a,b) => (a[0] === 'Без города') - (b[0] === 'Без города') || b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
+  if(fCity !== 'Все' && !cc.has(fCity)) fCity = 'Все';
+  $('cityChips').innerHTML = cities.length > 1 ? chip('data-c','Все','Все города',walks.length,fCity === 'Все') + cities.map(([c,n]) => chip('data-c',c,c,n,fCity === c)).join('') : '';
+  const scope = fCity !== 'Все' ? fCity : (cities.length === 1 ? cities[0][0] : null);
+  let ds = [];
+  if(scope){
+    const dc = new Map();
+    walks.forEach(w => { const set = new Set(); w.segments.forEach(s => { if(cityKey(s) === scope) s.districts.forEach(d => set.add(d)); }); set.forEach(d => dc.set(d, (dc.get(d) || 0) + 1)); });
+    ds = [...dc.entries()].sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
+  }
+  if(district !== 'Все' && !ds.some(x => x[0] === district)) district = 'Все';
+  $('distChips').innerHTML = ds.length ? chip('data-d','Все','Все районы',null,district === 'Все') + ds.map(([d,n]) => chip('data-d',d,d,n,district === d)).join('') : '';
 }
-$('chips').addEventListener('click', e => {
-  const b = e.target.closest('.chip'); if(!b) return;
-  district = b.dataset.d; buildChips(); render(true);
+$('cityChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if(!b) return; fCity = b.dataset.c; district = 'Все'; buildFilters(); render(true); });
+$('distChips').addEventListener('click', e => { const b = e.target.closest('.chip'); if(!b) return; district = b.dataset.d; buildFilters(); render(true); });
+$('kindSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  fKind = b.dataset.k;
+  document.querySelectorAll('#kindSeg button').forEach(x => x.classList.toggle('on', x === b));
+  render(true);
 });
 $('q').addEventListener('input', () => render(false));
 
 function visible(){
-  const q = $('q').value.trim().toLowerCase();
-  return walks.filter(w => (district==='Все' || w.district===district) && (!q || w.title.toLowerCase().includes(q)))
-              .sort((a,b) => String(b.date).localeCompare(String(a.date)));
+  const t = $('q').value.trim().toLowerCase();
+  return walks.filter(w => {
+    if(t && !w.title.toLowerCase().includes(t)) return false;
+    if(fKind !== 'all' && !w.segments.some(s => s.kind === fKind)) return false;
+    if(fCity !== 'Все' && !w.segments.some(s => cityKey(s) === fCity)) return false;
+    if(district !== 'Все' && !w.segments.some(s => (fCity === 'Все' || cityKey(s) === fCity) && s.districts.includes(district))) return false;
+    return true;
+  }).sort((a,b) => walkDate(b).localeCompare(walkDate(a)));
 }
 /* только то, что реально можно посчитать из данных; ничего не выдумываем */
 function renderStats(list){
-  const n = list.length;
-  const km = list.reduce((s,w) => s + kmOf(w), 0);
-  const videos = list.filter(hasVideo).length;
-  const districts = new Set(list.map(w => w.district)).size;
-  let mins = 0, nd = 0;
-  list.forEach(w => { const m = parseDur(w.duration); if(m != null){ mins += m; nd++; } });
-  const vw = list.filter(w => Number.isFinite(w.views));
-  const part = k => k < n ? ` (по ${k} из ${n})` : '';
-  const tiles = [
-    [n, 'прогулок'], [km.toFixed(1), 'км пройдено'], [videos, 'видео'], [districts, 'районов']
-  ];
-  if(nd) tiles.push([fmtMin(mins), 'в пути' + part(nd)]);
-  if(vw.length) tiles.push([fmtNum(vw.reduce((s,w) => s + w.views, 0)), 'просмотров' + part(vw.length)]);
+  const n = list.length, all = list.flatMap(w => w.segments);
+  const nWalk = all.filter(s => s.kind === 'walk').length, nVlog = all.filter(s => s.kind === 'vlog').length;
+  const km = list.reduce((a,w) => a + walkKm(w), 0);
+  const cities = new Set(all.map(s => s.city).filter(Boolean)).size;
+  const districts = new Set(all.flatMap(s => s.districts.map(d => d.toLowerCase()))).size;
+  let mins = 0, nd = 0; all.forEach(s => { const d = segDur(s); if(d){ mins += d; nd++; } });
+  const vv = list.map(viewsOf).filter(v => v != null);
+  const part = (k, t) => k < t ? ` (по ${k} из ${t})` : '';
+  const tiles = [[nWalk, 'прогулок']];
+  if(nVlog) tiles.push([nVlog, 'влогов']);
+  tiles.push([km.toFixed(1), 'км пройдено'], [list.filter(hasVideo).length, 'видео']);
+  if(cities) tiles.push([cities, 'городов']);
+  tiles.push([districts, 'районов']);
+  if(nd) tiles.push([fmtMin(mins), 'в пути' + part(nd, all.length)]);
+  if(vv.length) tiles.push([fmtNum(vv.reduce((a,v) => a + v, 0)), (YT_API_KEY ? 'просмотров' : 'просмотров (вручную)') + part(vv.length, n)]);
   $('stats').innerHTML = tiles.map(t => `<div class="stat"><b>${esc(t[0])}</b>${esc(t[1])}</div>`).join('');
-  if(n){
-    const longest = list.reduce((a,b) => kmOf(b) > kmOf(a) ? b : a);
-    $('stExtra').innerHTML = `Самая длинная: «${esc(longest.title)}» — ${kmOf(longest).toFixed(1)} км · в среднем ${(km/n).toFixed(1)} км за прогулку`;
+  const withKm = list.filter(w => walkKm(w) > 0);
+  if(withKm.length){
+    const longest = withKm.reduce((a,b) => walkKm(b) > walkKm(a) ? b : a);
+    $('stExtra').innerHTML = `Самая длинная: «${esc(longest.title)}» — ${walkKm(longest).toFixed(1)} км · в среднем ${(km/withKm.length).toFixed(1)} км на видео`;
   } else $('stExtra').textContent = '';
 }
 function cardHtml(w, i){
   const id = ytId(w.youtube);                 /* обложку берём только у YouTube */
   const thumb = id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
+  const kinds = new Set(w.segments.map(s => s.kind));
+  const badge = [kinds.has('walk') ? '🚶 Прогулка' : '', kinds.has('vlog') ? '🎬 Влог' : ''].filter(Boolean).join(' + ');
+  const cities = [...new Set(w.segments.map(s => s.city).filter(Boolean))];
+  const ds = [...new Set(w.segments.flatMap(s => s.districts))];
+  const place = [cities.join(', '), ds.join(', ')].filter(Boolean).join(' · ');
+  const km = walkKm(w), v = viewsOf(w), s0 = w.segments[0];
+  const meta = [fmtWalkDate(w), place && '📍 ' + place, km > 0 && km.toFixed(1) + ' км',
+                w.segments.length === 1 && s0.start && '🕒 ' + s0.start + (s0.end ? '–' + s0.end : ''),
+                w.segments.length > 1 && `маршрутов: ${w.segments.length}`,
+                s0.note && w.segments.length === 1 && '💬 ' + s0.note, v != null && '👁 ' + fmtNum(v)].filter(Boolean);
   return `
     <div class="item${w.id===activeId?' active':''}" data-id="${w.id}" style="--i:${Math.min(i,10)}" tabindex="0" role="button">
       <div class="thumb${thumb?'':' noimg'}">
         ${thumb ? `<img src="${thumb}" alt="" loading="lazy" decoding="async">` : ''}
         <div class="ph" aria-hidden="true"><i>▶</i><span>BY.FILATOV</span></div>
         <div class="shade"></div>
+        <span class="kind">${esc(badge)}</span>
         <h3>${esc(w.title)}</h3>
       </div>
       <div class="cbar">
-        <div class="meta"><span>${esc(fmtDate(w.date))}</span><span>${esc(w.district)}</span><span>${kmOf(w).toFixed(1)} км</span>${w.duration ? `<span>${esc(w.duration)}</span>` : ''}${Number.isFinite(w.views) ? `<span>👁 ${fmtNum(w.views)}</span>` : ''}</div>
+        <div class="meta">${meta.map(m => `<span>${esc(m)}</span>`).join('')}</div>
         ${hasVideo(w) ? `<div class="vb">${videoBtns(w, 'watch')}</div>` : ''}
       </div>
     </div>`;
@@ -596,7 +987,7 @@ function cardHtml(w, i){
 function render(animate){
   const vis = visible(), ids = new Set(vis.map(w => w.id));
   /* выбранная прогулка пропала из списка (фильтр/поиск) — снимаем выбор, чтобы «Удалить/Править» не трогали скрытую */
-  if(activeId != null && !ids.has(activeId)){ setStyleFor(activeId, false); activeId = null; }
+  if(activeId != null && !ids.has(activeId)){ activeId = null; paintAll(); hideInfo(); }
   walks.forEach(w => {
     const l = layers[w.id]; if(!l) return;
     const show = ids.has(w.id) && !(drawing && editId === w.id);   /* редактируемую прячем, чтобы не мешала */
@@ -607,14 +998,14 @@ function render(animate){
   renderStats(vis);
   updateAdminUI();
 }
-function rebuild(){ buildLayers(); buildChips(); render(true); }
+function rebuild(){ buildLayers(); buildPois(); buildFilters(); render(true); buildSupport(); $('aGoal').value = site.goal || ''; }
 
 /* обложка не загрузилась — показываем красивую заглушку */
 $('list').addEventListener('error', e => {
   if(e.target.tagName === 'IMG'){ const t = e.target.closest('.thumb'); if(t) t.classList.add('noimg'); }
 }, true);
 $('list').addEventListener('click', e => {
-  if(drawing || e.target.closest('a')) return;
+  if(drawing || poiMode || e.target.closest('a')) return;
   const it = e.target.closest('.item'); if(it) select(+it.dataset.id, true);
 });
 $('list').addEventListener('keydown', e => {
@@ -627,43 +1018,52 @@ function markActive(){
   document.querySelectorAll('.item').forEach(el => el.classList.toggle('active', +el.dataset.id === activeId));
   const el = document.querySelector(`.item[data-id="${activeId}"]`); if(el) el.scrollIntoView({ block:'nearest', behavior: REDUCE ? 'auto' : 'smooth' });
 }
+const infoPad = () => innerWidth <= 800
+  ? { paddingTopLeft:[30,40], paddingBottomRight:[30,215] }      /* карточка внизу */
+  : { paddingTopLeft:[50,50], paddingBottomRight:[375,50] };     /* карточка справа: маршрут вписывается левее неё */
+function walkPoints(w){ return w.segments.flatMap(s => s.route); }
 function select(id, fly, quiet){
-  const l = layers[id]; if(!l) return;
-  if(activeId != null && activeId !== id) setStyleFor(activeId, false);   /* старое выделение сбрасываем */
+  const l = layers[id], w = walks.find(x => x.id === id); if(!l || !w) return;
+  selStamp = Date.now();
+  activePoi = null;
   activeId = id;
-  setStyleFor(id, true);
-  l.casing.bringToFront(); l.glow.bringToFront(); l.line.bringToFront(); l.hit.bringToFront();
+  paintAll();                                                  /* выбранный ярко, остальные тускнеют, старое выделение сброшено */
+  l.segs.forEach(s => { if(s.line){ s.casing.bringToFront(); s.glow.bringToFront(); s.line.bringToFront(); s.hit.bringToFront(); } });
   markActive();
+  showInfo(walkInfoHtml(w));
   if(!quiet) play('select');
-  const token = ++animToken;
-  if(fly) map.fitBounds(l.line.getBounds(), { padding:[50,50], maxZoom:16, animate:!REDUCE });
+  const token = ++animToken, all = walkPoints(w);
+  if(fly && all.length) map.fitBounds(L.latLngBounds(all), { ...infoPad(), maxZoom:16, animate:!REDUCE });
   setTimeout(() => {
     if(token !== animToken || activeId !== id) return;        /* пока ждали, выбрали другую — ничего не делаем */
-    drawRoute(l);
-    if(fly) l.start.openPopup();
+    l.segs.forEach(drawRoute);
   }, fly && !REDUCE ? 500 : 0);
   updateAdminUI();
+}
+function deselect(){
+  activeId = null; activePoi = null;
+  animToken++;
+  paintAll(); hideInfo(); markActive(); updateAdminUI();
 }
 
 /* ---------- админ-режим ---------- */
 function updateAdminUI(){
   if(!isAdmin) return;
-  $('aNew').disabled = drawing;
-  $('aEdit').disabled = $('aDel').disabled = (activeId == null || drawing);
-  $('aExport').disabled = drawing;
+  const busy = drawing || poiMode;
+  $('aNew').disabled = $('aPoiNew').disabled = $('aExport').disabled = busy;
+  $('aEdit').disabled = $('aDel').disabled = (activeId == null || busy);
+  $('aPoiEdit').disabled = $('aPoiDel').disabled = (activePoi == null || busy);
   $('aNote').textContent = store.get(KEY_DRAFT)
     ? 'Есть правки, которых ещё нет в файле: их видишь только ты, в этом браузере. Нажми «Выгрузить в файл», чтобы их увидели зрители.'
-    : 'Админ-режим: эти кнопки видишь только ты. Чтобы изменения увидели зрители, выгрузи список в файл.';
+    : 'Админ-режим: эти кнопки видишь только ты. Чтобы изменения увидели зрители, выгрузи в файл.';
 }
+function applyData(d){ walks = d.walks; pois = d.pois; site = d.site; activeId = null; activePoi = null; hideInfo(); rebuild(); }
 function setAdmin(on){
-  cancelDraw();
-  closeExport();
+  cancelDraw(); cancelPoi(); closeExport();
   isAdmin = on;
   document.body.classList.toggle('admin', on);
   on ? store.set(KEY_ADMIN, '1') : store.del(KEY_ADMIN);
-  walks = on ? (loadDraft() || freshWalks()) : freshWalks();
-  activeId = null;
-  rebuild();
+  applyData(on ? (loadDraft() || freshData()) : freshData());
 }
 /* 5 быстрых кликов по заголовку включают/выключают админ-режим */
 let taps = [];
@@ -672,13 +1072,21 @@ $('logo').addEventListener('click', () => {
   if(taps.length >= 5){ taps = []; setAdmin(!isAdmin); }
 });
 $('aExit').addEventListener('click', () => setAdmin(false));
+$('aGoal').addEventListener('change', () => { site.goal = $('aGoal').value.trim(); saveDraft(); buildSupport(); updateAdminUI(); });
 
-/* ---------- рисование / правка маршрута ---------- */
+/* ---------- создание / правка видео и его маршрутов ---------- */
 const drawLine = L.polyline([], { color:'#2a9df4', weight:4, dashArray:'6 6', interactive:false }).addTo(map);
 const drawDots = L.layerGroup().addTo(map);
+const drawOther = L.layerGroup().addTo(map);
+let draft = null, segIdx = 0, saving = false;
+const newSeg = prev => ({ kind:'walk', date:prev ? prev.date : today(), start:'', end:'', city:prev ? prev.city : '', districts:[], route:[] });
+const wxKey = s => [s.date, s.start, (s.route[0] || []).join(',')].join('|');
 
 function nextId(){ return walks.reduce((m,w) => Math.max(m,w.id), 0) + 1; }
-function info(){ $('dInfo').textContent = pts.length ? `${pts.length} точек · ${dist(pts).toFixed(2)} км` : 'Кликай по карте'; }
+function info(){
+  const s = draft && draft.segments[segIdx];
+  $('dInfo').textContent = pts.length ? `${pts.length} точек${pts.length > 1 ? ' · ' + dist(pts).toFixed(2) + ' км' : ''}` : (s && s.kind === 'vlog' ? 'Кликни по карте: где снимал влог' : 'Кликай по карте');
+}
 function refreshDraw(){
   drawLine.setLatLngs(pts);
   drawDots.clearLayers();
@@ -689,124 +1097,282 @@ function refreshDraw(){
     m.on('contextmenu', () => { pts.splice(i,1); refreshDraw(); });
     m.addTo(drawDots);
   });
+  drawOther.clearLayers();
+  draft.segments.forEach((s,i) => { if(i !== segIdx && s.route.length > 1) L.polyline(s.route, { color:'#7a7a8c', weight:4, opacity:.7, dashArray:'4 6', interactive:false }).addTo(drawOther); });
   info();
 }
+function renderTabs(){
+  $('segTabs').innerHTML = draft.segments.map((s,i) => `<button data-i="${i}" class="${i === segIdx ? 'on' : ''}">${s.kind === 'vlog' ? '🎬' : '🚶'} Маршрут ${i+1}</button>`).join('') + '<button data-i="new">＋ ещё маршрут</button>';
+  $('dSegDel').style.display = draft.segments.length > 1 ? '' : 'none';
+}
+function loadSeg(){
+  const s = draft.segments[segIdx];
+  $('fKind').value = s.kind; $('fDate').value = s.date || ''; $('fStart').value = s.start || ''; $('fEnd').value = s.end || '';
+  $('fCity').value = s.city || ''; $('fDistricts').value = s.districts.join(', '); $('fNote').value = s.note || ''; $('fAdmin').value = s.adminNote || '';
+  $('fWeather').textContent = s.weather ? 'Погода: ' + weatherText(s.weather) : '';
+  pts = clone(s.route);
+  renderTabs(); refreshDraw();
+}
+function readSeg(){
+  const s = draft.segments[segIdx];
+  s.kind = $('fKind').value === 'vlog' ? 'vlog' : 'walk';
+  s.date = $('fDate').value; s.start = normTime($('fStart').value); s.end = normTime($('fEnd').value);
+  s.city = $('fCity').value.trim(); s.districts = splitList($('fDistricts').value);
+  const n = $('fNote').value.trim(); n ? (s.note = n) : delete s.note;
+  const an = $('fAdmin').value.trim(); an ? (s.adminNote = an) : delete s.adminNote;
+  s.route = pts.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)]);
+  if(s.weather && s._wx && s._wx !== wxKey(s)){ delete s.weather; delete s._wx; }   /* дата, время или место поменялись — погода устарела */
+}
+$('segTabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b || saving) return;
+  readSeg();
+  if(b.dataset.i === 'new'){ draft.segments.push(newSeg(draft.segments[segIdx])); segIdx = draft.segments.length - 1; }
+  else segIdx = +b.dataset.i;
+  loadSeg();
+});
+$('fKind').addEventListener('change', () => { readSeg(); renderTabs(); info(); });
+$('dSegDel').addEventListener('click', () => {
+  if(draft.segments.length < 2 || !confirm('Удалить этот маршрут из видео? Остальные маршруты останутся.')) return;
+  draft.segments.splice(segIdx, 1); segIdx = Math.max(0, segIdx - 1); loadSeg();
+});
 function startDraw(id){
-  closeExport();
+  closeExport(); cancelPoi(); hideInfo();
   drawing = true; editId = id;
   const w = id == null ? null : walks.find(x => x.id === id);
-  pts = w ? clone(w.route) : [];
-  $('fTitle').value = w ? w.title : '';
-  $('fYoutube').value = w ? (w.youtube || '') : '';
-  $('fVk').value = w ? (w.vk || '') : '';
-  $('fDate').value = w ? w.date : today();
-  $('fDistrict').value = w ? w.district : '';
-  $('fTime').value = w ? w.time : '';
-  $('fDur').value = w ? (w.duration || '') : '';
-  $('fViews').value = w && Number.isFinite(w.views) ? w.views : '';
-  $('dHead').textContent = w ? 'Правка прогулки' : 'Новая прогулка';
+  draft = w ? clone(w) : { id:null, title:'', youtube:'', vk:'', segments:[newSeg(null)] };
+  draft.segments.forEach(s => { s._orig = JSON.stringify(s.route); if(s.weather) s._wx = wxKey(s); });
+  segIdx = 0;
+  $('fTitle').value = draft.title; $('fYoutube').value = draft.youtube || ''; $('fVk').value = draft.vk || '';
+  $('dHead').textContent = w ? 'Правка видео' : 'Новая прогулка';
+  $('dInfo').textContent = '';
   $('drawPanel').classList.add('show');
   map.getContainer().classList.add('crosshair','drawing');
-  map.closePopup();
   render(false);
-  refreshDraw();
-  if(pts.length) map.fitBounds(L.latLngBounds(pts), { padding:[60,60], maxZoom:16 });
+  loadSeg();
+  const all = draft.segments.flatMap(s => s.route);
+  if(all.length) map.fitBounds(L.latLngBounds(all), { paddingTopLeft:[60,60], paddingBottomRight:[60,60], maxZoom:16 });
 }
-function cancelDraw(){
-  if(!drawing) return;
-  drawing = false; editId = null; pts = [];
-  drawLine.setLatLngs([]); drawDots.clearLayers();
+function endDraw(){
+  drawing = false; editId = null; pts = []; draft = null;
+  drawLine.setLatLngs([]); drawDots.clearLayers(); drawOther.clearLayers();
   $('drawPanel').classList.remove('show');
   map.getContainer().classList.remove('crosshair','drawing');
-  render(false);
 }
-function saveDraw(){
-  if(pts.length < 2){ $('dInfo').textContent = 'Нужно минимум 2 точки'; return; }
+function cancelDraw(){ if(!drawing) return; endDraw(); render(false); }
+async function saveDraw(){
+  if(saving) return;
+  readSeg();
+  for(let i=0;i<draft.segments.length;i++){
+    const s = draft.segments[i], need = s.kind === 'vlog' ? 1 : 2;
+    if(s.route.length < need){ segIdx = i; loadSeg(); $('dInfo').textContent = need === 1 ? 'Поставь на карте хотя бы одну точку' : 'Для прогулки нужно минимум 2 точки'; return; }
+  }
+  saving = true; $('dSave').disabled = true;
+  /* что не заполнено — определяем сами (бесплатные сервисы; не получилось — просто сохраняем как есть) */
+  try{
+    for(const s of draft.segments){
+      if(!s.city && !s.districts.length){ $('dInfo').textContent = 'Определяю город и районы…'; const g = await detectPlace(s.route); if(g){ s.city = g.city; s.districts = g.districts; } }
+      if(!s.weather && s.date && s.start){ $('dInfo').textContent = 'Узнаю погоду…'; const wx = await fetchWeather(s.route[0][0], s.route[0][1], s.date, s.start); if(wx) s.weather = wx; }
+    }
+  }catch(_){}
+  saving = false; $('dSave').disabled = false;
   const v = id => $(id).value.trim();
-  const rec = {
-    title: v('fTitle') || 'Без названия',
-    date: v('fDate') || today(),
-    district: v('fDistrict') || 'Без района',
-    time: v('fTime') || 'день',
-    duration: v('fDur'),
-    youtube: normUrl(v('fYoutube')),
-    vk: normUrl(v('fVk')),
-    route: pts.map(p => [+p[0].toFixed(5), +p[1].toFixed(5)])
-  };
-  const vv = v('fViews');
-  if(vv !== '' && Number.isFinite(+vv) && +vv >= 0) rec.views = Math.round(+vv);
+  const rec = { id:null, title:v('fTitle') || 'Без названия', youtube:normUrl(v('fYoutube')), vk:normUrl(v('fVk')),
+    segments: draft.segments.map(s => {
+      const o = { kind:s.kind, date:s.date || today(), start:s.start || '', end:s.end || '', city:s.city || '', districts:s.districts || [], route:s.route };
+      if(s.note) o.note = s.note;
+      if(s.adminNote) o.adminNote = s.adminNote;
+      if(s.weather) o.weather = s.weather;
+      if(Number.isFinite(s.km) && JSON.stringify(s.route) === s._orig) o.km = s.km;   /* маршрут не менялся — ручную дистанцию оставляем */
+      return o;
+    }) };
   let id;
   if(editId != null){
-    const i = walks.findIndex(w => w.id === editId);
-    const old = walks[i];
-    id = old.id;
-    const nw = { ...old, ...rec, id };
-    if(!('views' in rec)) delete nw.views;
-    if(JSON.stringify(old.route) !== JSON.stringify(nw.route)) delete nw.km;   /* маршрут изменился — дистанцию считаем заново */
-    walks[i] = nw;
-  } else { id = nextId(); walks.push({ id, ...rec }); }
+    const i = walks.findIndex(w => w.id === editId), old = walks[i];
+    id = old.id; rec.id = id;
+    if(Number.isFinite(old.views)) rec.views = old.views;
+    walks[i] = rec;
+  } else { id = nextId(); rec.id = id; walks.push(rec); }
   saveDraft();
-  drawing = false; editId = null; pts = [];
-  drawLine.setLatLngs([]); drawDots.clearLayers();
-  $('drawPanel').classList.remove('show');
-  map.getContainer().classList.remove('crosshair','drawing');
+  endDraw();
   activeId = null;
   rebuild();
   select(id, true, true);
   play('success');
 }
-map.on('click', e => { if(!drawing) return; pts.push([e.latlng.lat, e.latlng.lng]); refreshDraw(); });
+map.on('click', e => {
+  if(drawing){ pts.push([e.latlng.lat, e.latlng.lng]); refreshDraw(); return; }
+  if(poiMode){ placePoi(e.latlng); return; }
+  if(Date.now() - selStamp < 300) return;                    /* этот же клик только что выбрал маршрут */
+  if(activeId != null || activePoi != null) deselect();      /* клик мимо — снять выбор, маршруты снова обычные */
+});
 $('dUndo').addEventListener('click', () => { pts.pop(); refreshDraw(); });
 $('dClear').addEventListener('click', () => {
-  if(pts.length && !confirm('Стереть все точки маршрута и начать заново?')) return;
+  if(pts.length && !confirm('Стереть все точки этого маршрута и начать заново?')) return;
   pts = []; refreshDraw();
 });
 $('dSave').addEventListener('click', saveDraw);
 $('dCancel').addEventListener('click', cancelDraw);
+$('dGeo').addEventListener('click', async () => {
+  if(saving) return; readSeg();
+  const s = draft.segments[segIdx];
+  if(!s.route.length){ $('dInfo').textContent = 'Сначала поставь точки на карте'; return; }
+  saving = true; $('dInfo').textContent = 'Определяю город и районы…';
+  const g = await detectPlace(s.route); saving = false;
+  if(g){ s.city = g.city; s.districts = g.districts; loadSeg(); $('dInfo').textContent = 'Готово — можно поправить руками'; }
+  else $('dInfo').textContent = 'Не получилось связаться с сервисом карт. Впиши вручную.';
+});
+$('dWeather').addEventListener('click', async () => {
+  if(saving) return; readSeg();
+  const s = draft.segments[segIdx];
+  if(!s.route.length || !s.date || !s.start){ $('dInfo').textContent = 'Для погоды нужны точка на карте, дата и время начала'; return; }
+  saving = true; $('dInfo').textContent = 'Узнаю погоду…';
+  const wx = await fetchWeather(s.route[0][0], s.route[0][1], s.date, s.start); saving = false;
+  if(wx){ s.weather = wx; s._wx = wxKey(s); loadSeg(); $('dInfo').textContent = 'Готово'; }
+  else $('dInfo').textContent = 'Не удалось получить погоду (сервис не ответил или нет данных на эту дату).';
+});
 
 $('aNew').addEventListener('click', () => startDraw(null));
 $('aEdit').addEventListener('click', () => { if(activeId != null) startDraw(activeId); });
 $('aDel').addEventListener('click', () => {
   const w = walks.find(x => x.id === activeId); if(!w) return;
-  if(!confirm(`Удалить прогулку «${w.title}» полностью?`)) return;
+  if(!confirm(`Удалить «${w.title}» полностью (со всеми маршрутами)?`)) return;
   walks = walks.filter(x => x.id !== activeId);
-  activeId = null; saveDraft(); rebuild(); play('remove');
+  activeId = null; hideInfo(); saveDraft(); rebuild(); play('remove');
 });
 $('aReset').addEventListener('click', () => {
-  if(!confirm('Отменить все правки и вернуть список из файла?')) return;
-  cancelDraw(); store.del(KEY_DRAFT);
-  walks = freshWalks(); activeId = null; rebuild();
+  if(!confirm('Отменить все правки и вернуть данные из файла?')) return;
+  cancelDraw(); cancelPoi(); store.del(KEY_DRAFT);
+  applyData(freshData());
 });
 
-/* ---------- выгрузка списка в файл ---------- */
-function exportText(){
-  const q = JSON.stringify;
-  const rows = walks.map(w =>
-`  { id:${w.id}, title:${q(w.title)}, date:${q(w.date)}, district:${q(w.district)}, time:${q(w.time)}, duration:${q(w.duration || '')},
-    youtube:${q(w.youtube || '')}, vk:${q(w.vk || '')},${w.km != null ? ` km:${w.km},` : ''}${Number.isFinite(w.views) ? ` views:${w.views},` : ''}
-    route:${q(w.route)} }`);
-  return `const WALKS = [\n${rows.join(',\n')}\n];`;
+/* ---------- точки интереса: создание и правка ---------- */
+function shrinkImage(file, max, qual){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', qual));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('img')); };
+    img.src = url;
+  });
 }
+function poiPrev(){
+  const p = poiDraft && poiDraft.photo;
+  $('pPrev').innerHTML = p && poiPhotoOk(p) ? `<img src="${esc(p)}" alt="">` : '';
+  $('pPhotoDel').style.display = p ? '' : 'none';
+  if(p && p.startsWith('data:')) $('pInfo').textContent = `фото ≈ ${Math.round(p.length * .75 / 1024)} КБ`;
+}
+function startPoi(id){
+  closeExport(); hideInfo();
+  const p = id == null ? null : pois.find(x => x.id === id);
+  poiMode = true;
+  poiDraft = p ? clone(p) : { id:null, emoji:'📷', title:'', date:today(), city:'', note:'', photo:'', pos:null };
+  $('pEmoji').value = poiDraft.emoji; $('pTitle').value = poiDraft.title; $('pDate').value = poiDraft.date; $('pCity').value = poiDraft.city; $('pNote').value = poiDraft.note;
+  $('pPhotoUrl').value = poiDraft.photo && !poiDraft.photo.startsWith('data:') ? poiDraft.photo : ''; $('pPhotoFile').value = '';
+  $('pHead').textContent = p ? 'Правка точки интереса' : 'Новая точка интереса';
+  $('pHint').textContent = 'Кликни по карте, где это было. Точку можно перетащить.';
+  $('pInfo').textContent = '';
+  $('poiPanel').classList.add('show');
+  map.getContainer().classList.add('crosshair','drawing');
+  if(poiTmp){ map.removeLayer(poiTmp); poiTmp = null; }
+  if(poiDraft.pos) placePoi({ lat:poiDraft.pos[0], lng:poiDraft.pos[1] });
+  poiPrev(); updateAdminUI();
+}
+function placePoi(ll){
+  poiDraft.pos = [+ll.lat.toFixed(6), +ll.lng.toFixed(6)];
+  if(!poiTmp){
+    poiTmp = L.marker(poiDraft.pos, { draggable:true, icon:L.divIcon({ className:'poi-wrap', html:'<div class="poi" style="border-color:#2a9df4">📍</div>', iconSize:[30,30], iconAnchor:[15,15] }) }).addTo(map);
+    poiTmp.on('dragend', e => { const p = e.target.getLatLng(); poiDraft.pos = [+p.lat.toFixed(6), +p.lng.toFixed(6)]; });
+  } else poiTmp.setLatLng(L.latLng ? L.latLng(poiDraft.pos[0], poiDraft.pos[1]) : { lat:poiDraft.pos[0], lng:poiDraft.pos[1] });
+  $('pHint').textContent = 'Место выбрано. Заполни поля и сохрани (или кликни в другое место, чтобы передвинуть).';
+}
+function cancelPoi(){
+  if(!poiMode) return;
+  poiMode = false; poiDraft = null;
+  if(poiTmp){ map.removeLayer(poiTmp); poiTmp = null; }
+  $('poiPanel').classList.remove('show');
+  map.getContainer().classList.remove('crosshair','drawing');
+  updateAdminUI();
+}
+$('pPhotoFile').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; if(!f || !poiDraft) return;
+  $('pInfo').textContent = 'Сжимаю фото…';
+  try{ poiDraft.photo = await shrinkImage(f, 900, .72); $('pPhotoUrl').value = ''; poiPrev(); }
+  catch(_){ $('pInfo').textContent = 'Не получилось прочитать это фото (формат HEIC браузер может не открыть). Попробуй JPG или PNG.'; }
+});
+$('pPhotoUrl').addEventListener('input', () => { if(!poiDraft) return; const u = normUrl($('pPhotoUrl').value); poiDraft.photo = u; poiPrev(); });
+$('pPhotoDel').addEventListener('click', () => { if(!poiDraft) return; poiDraft.photo = ''; $('pPhotoUrl').value = ''; $('pPhotoFile').value = ''; $('pInfo').textContent = ''; poiPrev(); });
+$('pSave').addEventListener('click', () => {
+  if(!poiDraft) return;
+  if(!poiDraft.pos){ $('pInfo').textContent = 'Сначала кликни по карте — где это было'; return; }
+  const v = id => $(id).value.trim();
+  const rec = { id:poiDraft.id, emoji:$('pEmoji').value, title:v('pTitle') || 'Точка интереса', date:v('pDate'), city:v('pCity'), note:v('pNote'), photo:poiDraft.photo || '', pos:poiDraft.pos };
+  let id;
+  if(rec.id != null){ const i = pois.findIndex(p => p.id === rec.id); id = rec.id; if(i >= 0) pois[i] = rec; else pois.push(rec); }
+  else { id = pois.reduce((m,p) => Math.max(m,p.id), 0) + 1; rec.id = id; pois.push(rec); }
+  saveDraft(); cancelPoi(); buildPois();
+  if(!showPois){ $('poiChk').checked = true; showPois = true; poiLayer.addTo(map); }
+  selectPoi(id); play('success');
+});
+$('pCancel').addEventListener('click', cancelPoi);
+$('aPoiNew').addEventListener('click', () => startPoi(null));
+$('aPoiEdit').addEventListener('click', () => { if(activePoi != null) startPoi(activePoi); });
+$('aPoiDel').addEventListener('click', () => {
+  const p = pois.find(x => x.id === activePoi); if(!p) return;
+  if(!confirm(`Удалить точку «${p.title}»?`)) return;
+  pois = pois.filter(x => x.id !== activePoi); activePoi = null; hideInfo(); saveDraft(); buildPois(); updateAdminUI(); play('remove');
+});
+
+/* ---------- выгрузка в файл ---------- */
+function segText(s){
+  const f = [`kind:${q(s.kind)}`, `date:${q(s.date || '')}`, `start:${q(s.start || '')}`, `end:${q(s.end || '')}`, `city:${q(s.city || '')}`, `districts:${q(s.districts || [])}`];
+  if(s.note) f.push(`note:${q(s.note)}`);
+  if(s.adminNote) f.push(`adminNote:${q(s.adminNote)}`);
+  if(Number.isFinite(s.km)) f.push(`km:${s.km}`);
+  if(s.weather) f.push(`weather:${q(s.weather)}`);
+  return `      { ${f.join(', ')},\n        route:${q(s.route)} }`;
+}
+const walkText = w => `  { id:${w.id}, title:${q(w.title)}, youtube:${q(w.youtube || '')}, vk:${q(w.vk || '')},${Number.isFinite(w.views) ? ` views:${w.views},` : ''}\n    segments:[\n${w.segments.map(segText).join(',\n')}\n    ] }`;
+const poiText = p => `  { id:${p.id}, emoji:${q(p.emoji)}, title:${q(p.title)}, date:${q(p.date || '')}, city:${q(p.city || '')}, note:${q(p.note || '')}, pos:${q(p.pos)},\n    photo:${q(p.photo || '')} }`;
+function exportBlocks(){
+  return {
+    walks:`const WALKS = [\n${walks.map(walkText).join(',\n')}\n];`,
+    pois:`const POIS = [\n${pois.map(poiText).join(',\n')}\n];`,
+    site:`const SITE = {\n  goal: ${q(site.goal || '')}\n};`
+  };
+}
+let exportFull = '';
 function closeExport(){ $('exportPanel').classList.remove('show'); }
 $('aExport').addEventListener('click', () => {
-  $('exportOut').value = exportText();
-  $('xInfo').textContent = `${walks.length} прогулок`;
+  const b = exportBlocks();
+  exportFull = [b.walks, b.pois, b.site].join('\n');
+  $('exportOut').value = exportFull.length > 300000 ? '(текст очень большой из-за фото; используй кнопку «Скачать готовый index.html»)' : exportFull;
+  const kb = Math.round(pois.reduce((a,p) => a + (p.photo.startsWith('data:') ? p.photo.length * .75 : 0), 0) / 1024);
+  $('xInfo').textContent = `${walks.length} видео, ${pois.length} точек` + (kb > 3000 ? ` · фото занимают ${Math.round(kb/1024)} МБ: страница уже заметно тяжелеет` : '');
   $('exportPanel').classList.add('show');
 });
 $('xClose').addEventListener('click', closeExport);
 $('xCopy').addEventListener('click', async () => {
-  const t = $('exportOut').value;
-  try{ await navigator.clipboard.writeText(t); }
+  try{ await navigator.clipboard.writeText(exportFull); }
   catch(_){ $('exportOut').select(); document.execCommand('copy'); }
   $('xInfo').textContent = 'Скопировано ✔';
   play('success');
 });
-/* собирает страницу целиком: берёт её исходник с сайта и подставляет новый список прогулок */
+/* собирает страницу целиком: берёт её исходник с сайта и подставляет новые данные */
+function setBlock(src, open, close, text){
+  const a = src.indexOf(open);
+  const b = a < 0 ? -1 : src.indexOf(close, a + open.length);
+  if(a < 0 || b < 0) throw new Error('в файле не найден блок данных');
+  return src.slice(0, a + 1) + text + src.slice(b + close.length);
+}
 function buildPage(src){
-  const start = src.indexOf('\nconst WALKS = [\n');
-  const end = start < 0 ? -1 : src.indexOf('\n];', start);
-  if(start < 0 || end < 0) throw new Error('список прогулок в файле не найден');
-  return src.slice(0, start + 1) + exportText() + src.slice(end + 3);
+  const b = exportBlocks();
+  src = setBlock(src, '\nconst WALKS = [\n', '\n];', b.walks);
+  src = setBlock(src, '\nconst POIS = [\n', '\n];', b.pois);
+  return setBlock(src, '\nconst SITE = {\n', '\n};', b.site);
 }
 $('xDownload').addEventListener('click', async () => {
   if(onFile){ $('xInfo').textContent = 'Скачивание работает на сайте. Здесь скопируй текст ниже.'; return; }
@@ -824,18 +1390,18 @@ $('xDownload').addEventListener('click', async () => {
   }catch(_){ $('xInfo').textContent = 'Не получилось собрать файл — скопируй текст ниже.'; }
 });
 
-/* ---------- кнопка поддержки (выключена, пока нет настоящей ссылки) ---------- */
+/* ---------- кнопка поддержки и цель доната ---------- */
 function buildSupport(){
-  const u = safeUrl(SUPPORT_URL);
-  $('support').innerHTML = u
-    ? `<a class="sup-btn" href="${esc(u)}" target="_blank" rel="noopener">💛 Поддержать канал</a>`
-    : `<button class="sup-btn off" disabled title="Скоро: ссылка для поддержки ещё не добавлена">💛 Поддержать канал <small>— скоро</small></button>`;
+  const u = safeUrl(SUPPORT_URL), goal = String(site.goal || '').trim();
+  $('support').innerHTML = (goal ? `<div class="goal">🎯 <b>Цель:</b> ${esc(goal)}</div>` : '')
+    + (u ? `<a class="sup-btn" href="${esc(u)}" target="_blank" rel="noopener">💛 Поддержать канал</a>`
+         : `<button class="sup-btn off" disabled title="Скоро: ссылка для поддержки ещё не добавлена">💛 Поддержать канал <small>— скоро</small></button>`);
 }
 
 /* ---------- старт ---------- */
 updateSndBtn();
-buildSupport();
 setAdmin(location.hash === '#admin' || store.get(KEY_ADMIN) === '1');
+loadViews();
 </script>
 </body>
 </html>
