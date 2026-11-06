@@ -867,7 +867,7 @@ function buildLayers(){
   });
   paintAll();
 }
-/* плавная прорисовка маршрута (один path, без перерисовки карты) */
+/* Единая анимация: линия открывается ровно под единственным движущимся маркером. */
 let routeSpeed = 1, routeRunners = [], routeFrames = [];
 function stopRouteAnimation(){
   routeFrames.forEach(id => cancelAnimationFrame(id)); routeFrames = [];
@@ -877,106 +877,73 @@ function stopRouteAnimation(){
 function clearAnim(s){
   clearTimeout(s.animT);
   const p = s.line && s.line.getElement && s.line.getElement();
-  if(p){ p.style.transition = ''; p.style.strokeDasharray = ''; p.style.strokeDashoffset = ''; }
+  if(p){ p.style.transition = 'none'; p.style.strokeDasharray = ''; p.style.strokeDashoffset = ''; }
 }
-function animateRunnerMulti(segments, duration){
-  if(!segments || !segments.length || REDUCE) return;
+function playActiveRouteAnimation(){
+  if(activeId == null || REDUCE) return;
+  stopRouteAnimation();
+  const l = layers[activeId]; if(!l) return;
 
-  // Собираем все части выбранной прогулки в один последовательный путь.
-  // Между отдельными сегментами маркер переносится к началу следующего,
-  // но одновременно на карте существует только один движущийся маркер.
-  const parts = segments
-    .filter(s => s.route && s.route.length >= 2)
-    .map(s => {
-      const route = s.route;
-      const cumulative = [0];
-      for(let i=1;i<route.length;i++){
-        cumulative.push(cumulative[i-1] + dist([route[i-1], route[i]]));
-      }
-      return { route, cumulative, total:cumulative[cumulative.length-1] };
-    })
-    .filter(p => p.total > 0);
+  const parts = l.segs.filter(s => s.route && s.route.length >= 2 && s.line).map(s => {
+    const route = s.route;
+    const cumulative = [0];
+    for(let i=1;i<route.length;i++) cumulative.push(cumulative[i-1] + dist([route[i-1], route[i]]));
+    const total = cumulative[cumulative.length-1];
+    const path = s.line.getElement && s.line.getElement();
+    let svgLength = 0;
+    try { if(path && path.getTotalLength) svgLength = path.getTotalLength(); } catch(_) {}
+    if(path && svgLength > 0){
+      path.style.transition = 'none';
+      path.style.strokeDasharray = `${svgLength} ${svgLength}`;
+      path.style.strokeDashoffset = String(svgLength);
+    }
+    return { s, route, cumulative, total, path, svgLength };
+  }).filter(p => p.total > 0 && p.path && p.svgLength > 0);
 
-  const total = parts.reduce((sum,p) => sum + p.total, 0);
-  if(!(total > 0)) return;
+  const totalDistance = parts.reduce((sum,p) => sum + p.total, 0);
+  if(!totalDistance) return;
 
   const marker = L.marker(parts[0].route[0], {
     interactive:false, keyboard:false, zIndexOffset:1200,
-    icon:L.divIcon({
-      className:'route-runner-wrap',
-      html:'<div class="route-runner"></div>',
-      iconSize:[16,16], iconAnchor:[8,8]
-    })
+    icon:L.divIcon({ className:'route-runner-wrap', html:'<div class="route-runner"></div>', iconSize:[16,16], iconAnchor:[8,8] })
   }).addTo(map);
   routeRunners.push(marker);
 
+  // Скорость постоянная: маркер и открывающаяся линия используют одну шкалу прогресса.
+  const duration = Math.min(9000, Math.max(2200, totalDistance * 900)) / routeSpeed;
   const started = performance.now();
   const tick = now => {
     const progress = Math.min(1, (now-started)/duration);
-    let remaining = total * progress;
-    let partIndex = 0;
+    let remaining = totalDistance * progress;
+    let activePart = parts[parts.length-1];
+    let partDistance = activePart.total;
 
-    while(partIndex < parts.length-1 && remaining > parts[partIndex].total){
-      remaining -= parts[partIndex].total;
-      partIndex++;
+    for(const part of parts){
+      const shown = Math.min(part.total, Math.max(0, remaining));
+      const ratio = shown / part.total;
+      part.path.style.strokeDashoffset = String(part.svgLength * (1-ratio));
+      if(remaining <= part.total){ activePart = part; partDistance = shown; break; }
+      remaining -= part.total;
     }
 
-    const part = parts[partIndex];
-    const target = Math.min(remaining, part.total);
-    let i = part.cumulative.findIndex(v => v >= target);
+    const route = activePart.route, cumulative = activePart.cumulative;
+    let i = cumulative.findIndex(v => v >= partDistance);
     if(i < 1) i = 1;
-    if(i < 0) i = part.route.length-1;
-
-    const span = part.cumulative[i]-part.cumulative[i-1];
-    const fraction = span > 0 ? (target-part.cumulative[i-1])/span : 0;
-    const a = part.route[i-1], b = part.route[i];
-    marker.setLatLng([
-      a[0] + (b[0]-a[0])*fraction,
-      a[1] + (b[1]-a[1])*fraction
-    ]);
+    const span = cumulative[i]-cumulative[i-1];
+    const fraction = span > 0 ? Math.max(0, Math.min(1, (partDistance-cumulative[i-1])/span)) : 0;
+    const a = route[i-1], b = route[i];
+    marker.setLatLng([a[0]+(b[0]-a[0])*fraction, a[1]+(b[1]-a[1])*fraction]);
 
     if(progress < 1){
-      routeFrames.push(requestAnimationFrame(tick));
+      routeFrames = [requestAnimationFrame(tick)];
     } else {
-      setTimeout(() => {
-        if(map.hasLayer(marker)) map.removeLayer(marker);
-        routeRunners = routeRunners.filter(m => m !== marker);
-      }, 350);
+      parts.forEach(part => { part.path.style.strokeDasharray = ''; part.path.style.strokeDashoffset = ''; });
+      if(map.hasLayer(marker)) map.removeLayer(marker);
+      routeRunners = routeRunners.filter(m => m !== marker);
+      routeFrames = [];
     }
   };
-  routeFrames.push(requestAnimationFrame(tick));
-}
-function drawRoute(s){
-  if(!s.line) return;
-  if(REDUCE) return;
-  const p = s.line.getElement(); if(!p || !p.getTotalLength) return;
-  let len; try{ len = p.getTotalLength(); }catch(_){ return; }
-  if(!(len > 0)) return;
-  p.style.transition = 'none';
-  p.style.strokeDasharray = len + ' ' + len;
-  p.style.strokeDashoffset = len;
-  p.getBoundingClientRect();
-  const dur = Math.min(2600, Math.max(1100, len * 1.25)) / routeSpeed;
-  p.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.22,.72,.25,1)`;
-  p.style.strokeDashoffset = 0;
-  s.animT = setTimeout(() => clearAnim(s), dur + 120);
-}
-function playActiveRouteAnimation(){
-  if(activeId == null) return;
-  stopRouteAnimation();
-  const l = layers[activeId]; if(!l) return;
-  if(REDUCE) return;
-  l.segs.forEach(drawRoute);
-  const animatedSegments = l.segs.filter(s => s.route && s.route.length >= 2);
-  const durations = animatedSegments.map(s => {
-    const el = s.line && s.line.getElement && s.line.getElement();
-    let length = 0;
-    try { if(el && el.getTotalLength) length = el.getTotalLength(); } catch(_){}
-    return Math.min(2600, Math.max(1100, length * 1.25)) / routeSpeed;
-  });
-  const runnerDuration = durations.length ? Math.max(...durations) : 1100;
-  animateRunnerMulti(animatedSegments, runnerDuration);
-  play('success');
+  routeFrames = [requestAnimationFrame(tick)];
 }
 $('routeReplay').addEventListener('click', playActiveRouteAnimation);
 $('routeSpeed').addEventListener('click', () => {
