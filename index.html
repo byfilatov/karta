@@ -712,7 +712,8 @@ async function geocode(p){
     if(!r.ok) return null;
     const a = (await r.json()).address || {};
     return { city: a.city || a.town || a.village || a.hamlet || a.municipality || '',
-             district: a.suburb || a.neighbourhood || a.quarter || a.city_district || a.district || '' };
+             district: a.suburb || a.neighbourhood || a.quarter || a.city_district || a.district || '',
+             labels: ['suburb','neighbourhood','quarter','residential','city_district','district','borough'].map(k => a[k]).filter(Boolean) };   /* все подписи, от мелких к крупным */
   }catch(_){ return null; }
 }
 function samplePts(r){
@@ -738,6 +739,40 @@ function majorityLabels(values, minCount=2){
   const accepted = new Set([...counts].filter(([,n]) => n >= minCount).map(([v]) => v));
   return dedupeSeq(values.map(v => String(v || '').trim()).filter(v => v && accepted.has(v)));
 }
+/* ---------- справочник районов и микрорайонов Екатеринбурга ----------
+   Карта (Nominatim) отдаёт для точки то район, то микрорайон, то название ЖК или квартала.
+   Чтобы подписи были одинаковыми, их приводят к этому списку; всё, чего в нём нет, отбрасывается.
+   Чтобы добавить своё название — допиши строку: [«как называет карта (можно несколько через |)», «как показывать»]. */
+const EKB_DISTRICTS = ['Академический','Верх-Исетский','Железнодорожный','Кировский','Ленинский','Октябрьский','Орджоникидзевский','Чкаловский'];
+const EKB_MICRO = [
+  ['академический','Академический'],['широкая речка','Широкая Речка'],['краснолесье','Краснолесье'],['унц|уральский научный центр','УНЦ'],
+  ['виз|верх исетский завод','ВИЗ'],['заречный','Заречный'],['медный','Медный'],['перегонный','Перегонный'],['нижнеисетский|нижне исетский','Нижнеисетский'],
+  ['центр','Центр'],['вокзальный','Вокзальный'],['старая сортировка','Старая Сортировка'],['новая сортировка','Новая Сортировка'],['локомотивный','Локомотивный'],
+  ['семь ключей','Семь Ключей'],['северка','Северка'],
+  ['втузгородок|втуз городок','Втузгородок'],['пионерский','Пионерский'],['жби','ЖБИ'],['каменные палатки','Каменные Палатки'],['комсомольский','Комсомольский'],
+  ['шабровский','Шабровский'],['трубный','Трубный'],
+  ['юго западный','Юго-Западный'],['автовокзал','Автовокзал'],
+  ['парковый','Парковый'],['синие камни','Синие Камни'],['лечебный','Лечебный'],['птицефабрика','Птицефабрика'],['кольцово','Кольцово'],['компрессорный','Компрессорный'],['малый исток','Малый Исток'],['уктус|уктусский','Уктус'],
+  ['уралмаш','Уралмаш'],['эльмаш','Эльмаш'],['пышма','Пышма'],['садовый','Садовый'],['красненский','Красненский'],
+  ['ботаника|ботанический','Ботаника'],['вторчермет','Вторчермет'],['химмаш','Химмаш'],['елизавет','Елизавет'],['рудный','Рудный'],['шабры','Шабры'],['горный щит','Горный Щит'],['солнечный','Солнечный'],['светлый','Светлый']
+];
+const STOP_WORDS = new Set(['район','микрорайон','мкр','жилой','городской','округ','поселок']);
+const normPlace = t => String(t || '').toLowerCase().replace(/ё/g, 'е').replace(/["«»“”'.,()]/g, ' ').replace(/[-–—]/g, ' ')
+  .split(/\s+/).filter(w => w && !STOP_WORDS.has(w)).join(' ');   /* \b в JS не понимает кириллицу, поэтому слова режем вручную */
+const MICRO_MAP = new Map(), DIST_MAP = new Map();
+EKB_MICRO.forEach(([keys, name]) => keys.split('|').forEach(k => MICRO_MAP.set(k, name)));
+EKB_DISTRICTS.forEach(d => DIST_MAP.set(normPlace(d), d));
+/* по одной точке: берём самое точное, что есть в справочнике (микрорайон, иначе район); неизвестное возвращаем отдельно */
+function classifyPoint(labels){
+  let micro = '', dist = []; const unknown = [];
+  (labels || []).forEach(raw => {
+    const n = normPlace(raw);
+    if(MICRO_MAP.has(n)){ if(!micro) micro = MICRO_MAP.get(n); }
+    else if(DIST_MAP.has(n)) dist.push(DIST_MAP.get(n));
+    else if(n) unknown.push(String(raw).trim());
+  });
+  return { label: micro || dist[0] || '', unknown };
+}
 async function detectPlace(route){
   const found = [], pts = samplePts(route);
   for(let i=0;i<pts.length;i++){ if(i) await sleep(1100); const g = await geocode(pts[i]); if(g) found.push(g); }
@@ -746,10 +781,15 @@ async function detectPlace(route){
   const cityCounts = {};
   found.forEach(f => { if(f.city) cityCounts[f.city] = (cityCounts[f.city] || 0) + 1; });
   const city = Object.keys(cityCounts).sort((a,b) => cityCounts[b] - cityCounts[a])[0] || '';
-  /* Единичные подписи кварталов/микрорайонов от Nominatim отбрасываем:
-     они часто являются ближайшим локальным объектом, а не официальным районом. */
-  const districts = majorityLabels(found.map(f => f.district), 2);
-  return { city: cityLabels.length ? city : '', districts };
+  const finalCity = (cityLabels.length ? city : '').replace(/ё/g, 'е').replace(/Ё/g, 'Е');   /* «Берёзовский» и «Березовский» — один город */
+  /* Екатеринбург: подписи приводим к справочнику. Другие города: как раньше — подпись, которая встретилась минимум 2 раза */
+  if(finalCity === 'Екатеринбург'){
+    const per = found.map(f => classifyPoint(f.labels || [f.district]));
+    const districts = majorityLabels(per.map(p => p.label), 2);
+    const skipped = [...new Set(per.flatMap(p => p.unknown))].slice(0, 6);
+    return { city: finalCity, districts, skipped };
+  }
+  return { city: finalCity, districts: majorityLabels(found.map(f => f.district), 2), skipped: [] };
 }
 
 /* ---------- просмотры с YouTube (нужен ключ YT_API_KEY) ---------- */
@@ -1470,7 +1510,7 @@ $('dGeo').addEventListener('click', async () => {
   if(!s.route.length){ $('dInfo').textContent = 'Сначала поставь точки на карте'; return; }
   saving = true; $('dInfo').textContent = 'Определяю город и районы…';
   const g = await detectPlace(s.route); saving = false;
-  if(g){ s.city = g.city; s.districts = g.districts; loadSeg(); $('dInfo').textContent = 'Готово — можно поправить руками'; }
+  if(g){ s.city = g.city; s.districts = g.districts; loadSeg(); $('dInfo').textContent = 'Готово — можно поправить руками' + (g.skipped && g.skipped.length ? `. Карта называет ещё: ${g.skipped.join(', ')} (нет в справочнике, не добавил)` : '') + (!g.districts.length && g.city === 'Екатеринбург' ? '. Район не распознан — впиши вручную' : ''); }
   else $('dInfo').textContent = 'Не получилось связаться с сервисом карт. Впиши вручную.';
 });
 $('dWeather').addEventListener('click', async () => {
