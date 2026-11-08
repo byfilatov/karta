@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>ViktorBorn — заглушка</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+/* ===== ЦВЕТА: меняй здесь ===== */
+:root{
+  --bg1:#120826;      /* самый тёмный фон */
+  --bg2:#2b1a58;      /* фиолетовый фон */
+  --accent:#ffb347;   /* янтарный */
+  --cream:#fff3dc;    /* кремовый */
+  --violet:#8a5cff;   /* неоновый фиолетовый */
+  --beat:0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0b0518;font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif;color:var(--cream)}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
+  background:
+   radial-gradient(900px 600px at 30% 20%,rgba(138,92,255,.35),transparent 70%),
+   radial-gradient(800px 600px at 75% 85%,rgba(255,179,71,.18),transparent 70%),
+   linear-gradient(160deg,var(--bg2),var(--bg1))}
+#main{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding-top:150px;transition:padding .4s}
+.chat-on #main{padding-right:520px}
+#title{font-size:170px;font-weight:900;letter-spacing:4px;line-height:1;color:var(--cream);
+  text-shadow:0 0 calc(30px + var(--beat)*50px) rgba(255,179,71,.65),0 0 90px rgba(138,92,255,.6);
+  transform:scale(calc(1 + var(--beat)*.05))}
+#sub{margin-top:24px;font-size:56px;letter-spacing:10px;text-transform:uppercase;color:var(--accent)}
+#count{margin-top:20px;font-size:96px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--cream);min-height:110px}
+#bar{margin-top:46px;width:1100px;text-align:center}
+#barlabel{font-size:34px;letter-spacing:3px;margin-bottom:16px;color:var(--cream);opacity:.92}
+#track{height:54px;border-radius:30px;background:rgba(255,243,220,.10);border:3px solid rgba(255,243,220,.35);overflow:hidden;position:relative;box-shadow:0 0 30px rgba(138,92,255,.4)}
+#fill{height:100%;width:0%;border-radius:30px;background:linear-gradient(90deg,var(--violet),var(--accent));box-shadow:0 0 25px var(--accent);transition:width .25s ease-out}
+#barinfo{margin-top:12px;font-size:30px;color:var(--accent);font-weight:700}
+.flash #track{animation:flash .9s}
+@keyframes flash{0%,100%{box-shadow:0 0 30px rgba(138,92,255,.4)}30%{box-shadow:0 0 90px 20px var(--accent)}}
+#viz{position:absolute;left:0;bottom:0;width:1920px;height:280px;pointer-events:none}
+#fx{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none}
+#rain{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+#rain img{position:absolute;bottom:-90px;width:72px;height:72px;animation:rise linear forwards;filter:drop-shadow(0 0 10px rgba(0,0,0,.5))}
+@keyframes rise{to{transform:translateY(-1250px) rotate(25deg);opacity:.2}}
+#chat{position:absolute;right:40px;top:60px;bottom:320px;width:460px;display:none;flex-direction:column;justify-content:flex-end;gap:10px;overflow:hidden}
+.chat-on #chat{display:flex}
+.msg{background:rgba(18,8,38,.62);border-left:6px solid var(--violet);border-radius:14px;padding:12px 16px;font-size:28px;line-height:1.3;word-break:break-word;animation:pop .25s}
+.msg b{margin-right:8px}
+.msg img{height:36px;vertical-align:middle;margin:0 2px}
+@keyframes pop{from{transform:translateX(30px);opacity:0}}
+/* панель настроек (в OBS не показывается) */
+#gear{position:fixed;right:10px;top:10px;z-index:20;background:#0009;color:#fff;border:0;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:16px;display:none}
+#panel{position:fixed;right:10px;top:50px;z-index:20;width:360px;max-height:90vh;overflow:auto;background:#150b2bee;color:#fff;border:1px solid #8a5cff;border-radius:12px;padding:14px;font-size:14px;display:none}
+#panel label{display:block;margin:8px 0 3px;opacity:.8}
+#panel input[type=text],#panel input[type=number],#panel textarea{width:100%;padding:6px;border-radius:6px;border:1px solid #555;background:#0007;color:#fff}
+#panel .row{display:flex;gap:8px;align-items:center;margin:4px 0}
+#panel button{margin-top:8px;padding:7px 10px;border-radius:8px;border:0;background:#ffb347;color:#222;font-weight:700;cursor:pointer}
+#status{position:fixed;left:10px;bottom:8px;font-size:12px;opacity:.7;z-index:20;display:none}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="rain"></div>
+  <div id="main">
+    <div id="title">ViktorBorn</div>
+    <div id="sub">Скоро начнём</div>
+    <div id="count"></div>
+    <div id="bar">
+      <div id="barlabel">ЗАПОЛНИ ПОЛОСКУ — СПАМЬ В ЧАТ!</div>
+      <div id="track"><div id="fill"></div></div>
+      <div id="barinfo"></div>
+    </div>
+  </div>
+  <div id="chat"></div>
+  <canvas id="viz" width="1920" height="280"></canvas>
+  <canvas id="fx" width="1920" height="1080"></canvas>
+</div>
+
+<button id="gear">⚙ Настройки</button>
+<div id="panel">
+  <b>Настройки заглушки</b>
+  <label>Канал на Twitch</label><input type="text" id="p_channel">
+  <label>Заголовок</label><input type="text" id="p_title">
+  <label>Подзаголовок</label><input type="text" id="p_sub">
+  <label>Таймер до (ЧЧ:ММ, пусто — без таймера)</label><input type="text" id="p_until" placeholder="20:30">
+  <label>Цель полоски (очков)</label><input type="number" id="p_goal" min="10">
+  <label>Спад полоски (очков/сек)</label><input type="number" id="p_decay" step="0.1" min="0">
+  <div style="margin-top:8px">Что показывать:</div>
+  <div class="row"><input type="checkbox" id="f_chat"> чат на экране</div>
+  <div class="row"><input type="checkbox" id="f_bar"> полоска активности</div>
+  <div class="row"><input type="checkbox" id="f_viz"> эквалайзер (музыка)</div>
+  <div class="row"><input type="checkbox" id="f_rain"> дождь из смайлов</div>
+  <div class="row"><input type="checkbox" id="f_fx"> конфетти при заполнении</div>
+  <div class="row"><input type="checkbox" id="f_count"> таймер</div>
+  <div class="row"><input type="checkbox" id="p_demo"> демо-чат (для теста)</div>
+  <button id="btnAudio">🎤 Включить звук (микрофон / кабель)</button>
+  <label>Ссылка для OBS (источник «Браузер»)</label>
+  <textarea id="p_url" rows="4" readonly></textarea>
+  <button id="btnCopy">Копировать ссылку</button>
+</div>
+<div id="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const P=new URLSearchParams(location.search);
+const FEATS=['chat','bar','viz','rain','fx','count'];
+
+const cfg={
+  channel:P.get('channel')||'viktorborn',
+  title:P.get('title')||'ViktorBorn',
+  sub:P.get('sub')||'Скоро начнём',
+  until:P.get('until')||'',
+  goal:+P.get('goal')||100,
+  decay:P.has('decay')?+P.get('decay'):1.2,
+  demo:P.get('demo')==='1',
+  audio:P.get('audio')==='1',
+  off:new Set((P.get('off')||'').split(',').filter(Boolean))
+};
+const on=f=>!cfg.off.has(f);
+
+/* ---------- масштаб под любой размер окна ---------- */
+function fit(){
+  const s=Math.min(innerWidth/1920,innerHeight/1080);
+  const st=$('#stage');
+  st.style.transform='scale('+s+')';
+  st.style.left=((innerWidth-1920*s)/2)+'px';
+  st.style.top=((innerHeight-1080*s)/2)+'px';
+}
+addEventListener('resize',fit);fit();
+
+/* ---------- применение настроек ---------- */
+function applyCfg(){
+  $('#title').textContent=cfg.title;
+  $('#sub').textContent=cfg.sub;
+  document.body.classList.toggle('chat-on',on('chat'));
+  $('#bar').style.display=on('bar')?'':'none';
+  $('#viz').style.display=on('viz')?'':'none';
+  $('#rain').style.display=on('rain')?'':'none';
+  $('#fx').style.display=on('fx')?'':'none';
+  $('#count').style.display=on('count')&&cfg.until?'':'none';
+  A.goal=cfg.goal;
+  updateBar();
+}
+
+/* ---------- полоска активности ---------- */
+const A={val:0,goal:100,level:1,last:{}};
+function updateBar(){
+  $('#fill').style.width=Math.min(100,A.val/A.goal*100)+'%';
+  $('#barinfo').textContent='Уровень '+A.level+' · '+Math.floor(Math.min(100,A.val/A.goal*100))+'%';
+}
+function addActivity(user,pts){
+  const now=Date.now();
+  if(A.last[user]&&now-A.last[user]<700)pts=0.5; // один человек не может залить полоску в одиночку
+  A.last[user]=now;
+  A.val+=pts;
+  chatEnergy=Math.min(1,chatEnergy+0.15);
+  if(A.val>=A.goal){
+    A.val=0;A.level++;A.goal=Math.round(A.goal*1.15);
+    burst();
+    const b=document.body;b.classList.add('flash');setTimeout(()=>b.classList.remove('flash'),900);
+  }
+  updateBar();
+}
+
+/* ---------- чат ---------- */
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function emoteUrl(id){return 'https://static-cdn.jtvnw.net/emoticons/v2/'+id+'/default/dark/3.0'}
+function renderMessage(text,emoteTag){
+  const chars=Array.from(text);
+  const ranges=[];
+  if(emoteTag){
+    emoteTag.split('/').forEach(e=>{
+      const [id,pos]=e.split(':');
+      if(!pos)return;
+      pos.split(',').forEach(r=>{const[a,b]=r.split('-').map(Number);ranges.push({id,a,b})});
+    });
+  }
+  ranges.sort((x,y)=>x.a-y.a);
+  let html='',i=0;
+  ranges.forEach(r=>{
+    html+=esc(chars.slice(i,r.a).join(''));
+    html+='<img src="'+emoteUrl(r.id)+'" alt="">';
+    i=r.b+1;
+  });
+  html+=esc(chars.slice(i).join(''));
+  return {html,ids:ranges.map(r=>r.id)};
+}
+function onChat(name,color,text,emoteTag){
+  const r=renderMessage(text,emoteTag);
+  if(on('chat')){
+    const d=document.createElement('div');d.className='msg';
+    d.innerHTML='<b style="color:'+(color||'#ffb347')+'">'+esc(name)+'</b>'+r.html;
+    const c=$('#chat');c.appendChild(d);
+    while(c.children.length>9)c.removeChild(c.firstChild);
+  }
+  if(on('rain'))r.ids.slice(0,5).forEach(rainEmote);
+  addActivity(name,2+Math.min(r.ids.length,4));
+}
+function rainEmote(id){
+  const rain=$('#rain');
+  if(rain.children.length>70)return;
+  const im=document.createElement('img');im.src=emoteUrl(id);
+  im.style.left=(Math.random()*1800)+'px';
+  im.style.animationDuration=(5+Math.random()*4)+'s';
+  rain.appendChild(im);
+  setTimeout(()=>im.remove(),9500);
+}
+
+/* ---------- подключение к чату Twitch (анонимно, только чтение) ---------- */
+let ws=null,retry=0,demoTimer=null;
+function setStatus(t){const s=$('#status');s.textContent=t}
+function handleLine(line){
+  if(!line)return;
+  if(line.startsWith('PING')){ws&&ws.send('PONG :tmi.twitch.tv');return}
+  const m=line.match(/^@([^ ]+) :([^!]+)![^ ]+ PRIVMSG #[^ ]+ :(.*)$/);
+  if(!m)return;
+  const tags={};m[1].split(';').forEach(t=>{const k=t.indexOf('=');tags[t.slice(0,k)]=t.slice(k+1)});
+  let text=m[3].replace(/^\u0001ACTION /,'').replace(/\u0001$/,'');
+  onChat(tags['display-name']||m[2],tags.color,text,tags.emotes);
+}
+function connect(){
+  disconnect();
+  if(cfg.demo){startDemo();setStatus('демо-чат');return}
+  if(!cfg.channel)return;
+  ws=new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+  ws.onopen=()=>{
+    retry=0;
+    ws.send('CAP REQ :twitch.tv/tags');
+    ws.send('NICK justinfan'+Math.floor(10000+Math.random()*80000));
+    ws.send('JOIN #'+cfg.channel.toLowerCase());
+    setStatus('чат: подключено к #'+cfg.channel);
+  };
+  ws.onmessage=e=>String(e.data).split('\r\n').forEach(handleLine);
+  ws.onclose=()=>{setStatus('чат: переподключение…');setTimeout(()=>{if(ws&&!cfg.demo)connect()},Math.min(15000,1000*++retry))};
+  ws.onerror=()=>{};
+}
+function disconnect(){
+  if(ws){const w=ws;ws=null;w.onclose=null;try{w.close()}catch(e){}}
+  if(demoTimer){clearTimeout(demoTimer);demoTimer=null}
+}
+/* демо: фейковый чат, чтобы проверить оформление без стрима */
+const DEMO_EMOTES=[['Kappa','25'],['Keepo','1902'],['4Head','354'],['PogChamp','305954156']];
+const DEMO_NAMES=['Alex','Mira','Dron','Kot','Nika','Zed','Lisa','Bob'];
+const DEMO_WORDS=['го!','ждём','привет','кто тут?','музыка огонь','давай уже','))','ща начнётся'];
+function startDemo(){
+  const tick=()=>{
+    const n=1+Math.floor(Math.random()*3);
+    let text='',tag=[],pos=0;
+    for(let i=0;i<n;i++){
+      const [nm,id]=DEMO_EMOTES[Math.floor(Math.random()*DEMO_EMOTES.length)];
+      tag.push(id+':'+pos+'-'+(pos+nm.length-1));
+      text+=nm+' ';pos+=nm.length+1;
+    }
+    text+=DEMO_WORDS[Math.floor(Math.random()*DEMO_WORDS.length)];
+    const emotes={};tag.forEach(t=>{const[id,r]=t.split(':');(emotes[id]=emotes[id]||[]).push(r)});
+    const tagStr=Object.keys(emotes).map(id=>id+':'+emotes[id].join(',')).join('/');
+    onChat(DEMO_NAMES[Math.floor(Math.random()*DEMO_NAMES.length)],['#ffb347','#8a5cff','#ff6b9d','#5ce1e6'][Math.floor(Math.random()*4)],text,tagStr);
+    demoTimer=setTimeout(tick,300+Math.random()*1000);
+  };
+  tick();
+}
+
+/* ---------- звук и эквалайзер ---------- */
+const vc=$('#viz'),vx=vc.getContext('2d');
+let analyser=null,freq=null,chatEnergy=0,beat=0;
+async function startAudio(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    const ac=new (window.AudioContext||window.webkitAudioContext)();
+    const src=ac.createMediaStreamSource(stream);
+    analyser=ac.createAnalyser();analyser.fftSize=256;analyser.smoothingTimeConstant=.8;
+    src.connect(analyser);
+    freq=new Uint8Array(analyser.frequencyBinCount);
+    setStatus('звук подключён');
+  }catch(e){
+    analyser=null;
+    setStatus('звук недоступен — эквалайзер работает от активности чата');
+  }
+}
+/* ---------- конфетти ---------- */
+const fc=$('#fx'),fx=fc.getContext('2d');let parts=[];
+function burst(){
+  if(!on('fx'))return;
+  const cols=['#ffb347','#8a5cff','#fff3dc','#ff6b9d'];
+  for(let i=0;i<160;i++){
+    parts.push({x:960,y:620,vx:(Math.random()-.5)*34,vy:-Math.random()*30-8,g:.55,s:8+Math.random()*10,c:cols[i%4],r:Math.random()*6,vr:(Math.random()-.5)*.4,life:1});
+  }
+}
+/* ---------- главный цикл ---------- */
+let t0=performance.now();
+function loop(now){
+  const dt=Math.min(.1,(now-t0)/1000);t0=now;const t=now/1000;
+  // спад полоски
+  if(cfg.decay>0&&A.val>0){A.val=Math.max(0,A.val-cfg.decay*dt);updateBar()}
+  chatEnergy=Math.max(0,chatEnergy-dt*.4);
+  // эквалайзер
+  const N=56,w=1920/N;
+  let bass=0;
+  if(analyser){analyser.getByteFrequencyData(freq);for(let i=1;i<6;i++)bass+=freq[i];bass=bass/5/255}
+  else bass=0.15+0.15*Math.max(0,Math.sin(t*4))+chatEnergy*0.5;
+  beat+=(bass-beat)*0.35;
+  document.documentElement.style.setProperty('--beat',beat.toFixed(3));
+  if(on('viz')){
+    vx.clearRect(0,0,1920,280);
+    for(let i=0;i<N;i++){
+      let v;
+      if(analyser)v=freq[Math.floor(1+Math.pow(i/N,1.6)*(freq.length-2))]/255;
+      else v=0.18+0.14*Math.sin(t*2+i*.35)+0.12*Math.sin(t*3.3+i*.8)+chatEnergy*0.45;
+      v=Math.max(0.04,Math.min(1,v));
+      const h=v*260;
+      const g=vx.createLinearGradient(0,280,0,280-h);
+      g.addColorStop(0,'rgba(138,92,255,.85)');g.addColorStop(1,'rgba(255,179,71,.95)');
+      vx.fillStyle=g;
+      vx.beginPath();vx.roundRect(i*w+5,280-h,w-10,h,8);vx.fill();
+    }
+  }
+  // конфетти
+  if(parts.length){
+    fx.clearRect(0,0,1920,1080);
+    parts.forEach(p=>{p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life-=.007;
+      fx.save();fx.globalAlpha=Math.max(0,p.life);fx.translate(p.x,p.y);fx.rotate(p.r);fx.fillStyle=p.c;fx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);fx.restore()});
+    parts=parts.filter(p=>p.life>0&&p.y<1200);
+    if(!parts.length)fx.clearRect(0,0,1920,1080);
+  }
+  requestAnimationFrame(loop);
+}
+/* ---------- таймер ---------- */
+function tickCount(){
+  const el=$('#count');
+  if(!on('count')||!cfg.until){el.style.display='none';return}
+  el.style.display='';
+  const m=cfg.until.match(/^(\d{1,2}):(\d{2})$/);
+  if(!m){el.textContent='';return}
+  const target=new Date();target.setHours(+m[1],+m[2],0,0);
+  const diff=Math.floor((target-new Date())/1000);
+  if(diff<=0){el.textContent='Вот-вот начнём!';return}
+  const h=Math.floor(diff/3600),mm=String(Math.floor(diff%3600/60)).padStart(2,'0'),s=String(diff%60).padStart(2,'0');
+  el.textContent=(h?h+':':'')+mm+':'+s;
+}
+setInterval(tickCount,1000);
+
+/* ---------- панель настроек ---------- */
+const inObs=!!window.obsstudio;
+if(!inObs){$('#gear').style.display='block';$('#status').style.display='block'}
+$('#gear').onclick=()=>{const p=$('#panel');p.style.display=p.style.display==='block'?'none':'block'};
+addEventListener('keydown',e=>{if(e.key==='s'||e.key==='S'||e.key==='ы'||e.key==='Ы'){if(document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA')$('#gear').click()}});
+function syncPanel(){
+  $('#p_channel').value=cfg.channel;$('#p_title').value=cfg.title;$('#p_sub').value=cfg.sub;
+  $('#p_until').value=cfg.until;$('#p_goal').value=cfg.goal;$('#p_decay').value=cfg.decay;$('#p_demo').checked=cfg.demo;
+  FEATS.forEach(f=>$('#f_'+f).checked=on(f));
+  buildUrl();
+}
+function buildUrl(){
+  const q=new URLSearchParams();
+  if(cfg.channel!=='viktorborn')q.set('channel',cfg.channel);
+  if(cfg.title!=='ViktorBorn')q.set('title',cfg.title);
+  if(cfg.sub!=='Скоро начнём')q.set('sub',cfg.sub);
+  if(cfg.until)q.set('until',cfg.until);
+  if(cfg.goal!==100)q.set('goal',cfg.goal);
+  if(cfg.decay!==1.2)q.set('decay',cfg.decay);
+  if(cfg.demo)q.set('demo','1');
+  const off=FEATS.filter(f=>!on(f));if(off.length)q.set('off',off.join(','));
+  const qs=q.toString();
+  $('#p_url').value=location.origin+location.pathname+(qs?'?'+qs:'');
+}
+function readPanel(){
+  cfg.channel=$('#p_channel').value.trim().replace(/^#/,'');
+  cfg.title=$('#p_title').value||'ViktorBorn';
+  cfg.sub=$('#p_sub').value;
+  cfg.until=$('#p_until').value.trim();
+  cfg.goal=Math.max(10,+$('#p_goal').value||100);
+  cfg.decay=Math.max(0,+$('#p_decay').value||0);
+  cfg.off=new Set(FEATS.filter(f=>!$('#f_'+f).checked));
+  const demo=$('#p_demo').checked;
+  const reconnect=demo!==cfg.demo||false;
+  cfg.demo=demo;
+  applyCfg();buildUrl();tickCount();
+  return reconnect;
+}
+['p_title','p_sub','p_until','p_goal','p_decay'].forEach(id=>$('#'+id).addEventListener('input',readPanel));
+$('#p_channel').addEventListener('change',()=>{readPanel();connect()});
+$('#p_demo').addEventListener('change',()=>{readPanel();connect()});
+FEATS.forEach(f=>$('#f_'+f).addEventListener('change',readPanel));
+$('#btnAudio').onclick=startAudio;
+$('#btnCopy').onclick=()=>{$('#p_url').select();document.execCommand('copy')};
+
+/* ---------- старт ---------- */
+applyCfg();syncPanel();tickCount();connect();
+if(cfg.audio)startAudio();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
